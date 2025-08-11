@@ -1,0 +1,77 @@
+[
+  {
+    "name": "Varanasi",
+    "location": "Varanasi, Uttar Pradesh",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/6/64/Dasaswamedh_Ghat..jpg",
+    "description": "One of the world's oldest living cities, Varanasi is a spiritual hub along the banks of the Ganges, known for its ghats, temples, and evening Ganga Aarti.",
+    "bestTimeToVisit": "October to March",
+    "activities": [
+      "Evening Ganga Aarti at Dashashwamedh Ghat",
+      "Boat ride on the Ganges",
+      "Visit Kashi Vishwanath Temple",
+      "Walk through the old city lanes"
+    ],
+    "tags": ["Spiritual", "Culture", "Budget"],
+    "estimatedBudget": "₹1,200–₹1,800 per day"
+  },
+  {
+    "name": "Pondicherry",
+    "location": "Puducherry",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/f/f9/Rock_Beach_Puducherry.jpg",
+    "description": "A charming coastal town with French colonial architecture, peaceful beaches, and affordable cafes.",
+    "bestTimeToVisit": "October to February",
+    "activities": [
+      "Stroll along Rock Beach",
+      "Explore French Quarter",
+      "Visit Auroville",
+      "Try budget-friendly French-Indian fusion food"
+    ],
+    "tags": ["Beach", "Culture", "Budget"],
+    "estimatedBudget": "₹1,500–₹2,200 per day"
+  },
+  {
+    "name": "Rishikesh",
+    "location": "Rishikesh, Uttarakhand",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/d/d5/Kundalini_Yoga_Teacher_Training_in_Rishikesh.jpg   ",
+    "description": "The yoga capital of the world, Rishikesh offers affordable stays, spiritual vibes, and adventure activities by the Ganges.",
+    "bestTimeToVisit": "September to November, March to May",
+    "activities": [
+      "Attend free yoga sessions",
+      "Walk on Laxman Jhula",
+      "River rafting",
+      "Ganga Aarti at Triveni Ghat"
+    ],
+    "tags": ["Adventure", "Spiritual", "Budget"],
+    "estimatedBudget": "₹1,200–₹2,000 per day"
+  },
+  {
+    "name": "Pushkar",
+    "location": "Pushkar, Rajasthan",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/7/73/20191214_Zach%C3%B3d_s%C5%82o%C5%84ca_nad_jeziorem_Puszkar_1721_8613.jpg",
+    "description": "A small desert town famous for its holy lake, vibrant bazaars, and the annual Pushkar Camel Fair.",
+    "bestTimeToVisit": "October to March",
+    "activities": [
+      "Visit Brahma Temple",
+      "Walk around Pushkar Lake",
+      "Shop at local bazaars",
+      "Camel safari in nearby dunes"
+    ],
+    "tags": ["Culture", "Shopping", "Budget"],
+    "estimatedBudget": "₹1,000–₹1,500 per day"
+  },
+  {
+    "name": "McLeod Ganj",
+    "location": "Dharamshala, Himachal Pradesh",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/1/1c/MacLeod_Ganj_Busstop.jpg",
+    "description": "A peaceful hill station known for Tibetan culture, monasteries, and scenic treks, offering affordable guesthouses and cafes.",
+    "bestTimeToVisit": "March to June, September to November",
+    "activities": [
+      "Visit Namgyal Monastery",
+      "Trek to Triund",
+      "Explore Tibetan markets",
+      "Enjoy budget-friendly cafes"
+    ],
+    "tags": ["Mountains", "Culture", "Budget"],
+    "estimatedBudget": "₹1,200–₹1,800 per day"
+  }
+]

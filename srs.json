@@ -1,0 +1,139 @@
+{
+  "SRS": {
+    "title": "Social Group Travel Planner App",
+    "version": "1.1",
+    "authors": ["Ravi Garg"],
+    "lastUpdated": "2025-06-28",
+    "description": "A collaborative trip planning and discovery platform where verified users can create, join, and manage travel groups, interact with AI for location suggestions, and plan experiences in real time.",
+    "stack": {
+      "frontend_backend": "Next.js (App Router with API routes)",
+      "authentication": "Supabase Auth (email OTP, Google OAuth)",
+      "database": "Supabase (PostgreSQL)",
+      "storage": "Supabase Storage",
+      "realtime": "Supabase Realtime or Socket.IO (for chat)",
+      "ai": "Gemini API for location-aware travel assistance"
+    },
+    "modules": [
+      {
+        "name": "User Authentication & Verification",
+        "description": "Handles secure user onboarding and login.",
+        "features": [
+          "Email-based registration and login with OTP verification",
+          "Google OAuth login",
+          "Forgot password & OTP recovery flow",
+          "Store minimal profile: name, avatar, bio, verification status"
+        ]
+      },
+      {
+        "name": "Trip Discovery & Join Requests",
+        "description": "Users can explore and request to join public or invite-only trips.",
+        "features": [
+          "Browse public trips with filters (date, location, tags, budget)",
+          "Search by destination or interest",
+          "View trip preview: name, description, dates, current members",
+          "Request to join or apply via invite link",
+          "Visibility: public, private, link-restricted with optional password or expiry"
+        ]
+      },
+      {
+        "name": "Trip Creation & Configuration",
+        "description": "Users can create customizable trips with role-based collaboration.",
+        "features": [
+          "Create trips with basic info: title, description, duration, cover photo",
+          "Set visibility level (public/private/link)",
+          "Generate invite links with optional password & expiry",
+          "Add tags (e.g., trekking, beach, party)"
+        ]
+      },
+      {
+        "name": "Trip Dashboard: Itinerary + Chat + AI",
+        "description": "Centralized trip workspace with tools for planning and coordination.",
+        "features": [
+          "Create & edit itinerary timeline (drag-and-drop)",
+          "Add events with time, location, description, map link",
+          "Comment on specific itinerary items",
+          "Group chat per trip with media sharing",
+          "AI assistant (via Gemini) for smart suggestions based on location, group size, food type, interests, etc.",
+          "Trip lock feature to freeze edits before X days of start date (configurable by admin)"
+        ]
+      },
+      {
+        "name": "User Roles & Permissions",
+        "description": "Role-based access for collaborative control.",
+        "roles": [
+          {
+            "name": "Creator / Admin",
+            "permissions": [
+              "Full control over trip",
+              "Edit details and itinerary",
+              "Approve/reject join requests",
+              "Promote/demote users",
+              "Remove users",
+              "Lock/unlock trip"
+            ]
+          },
+          {
+            "name": "Captain / Manager",
+            "permissions": [
+              "Edit itinerary and events",
+              "Moderate chat & media",
+              "Approve join requests",
+              "Send notifications"
+            ]
+          },
+          {
+            "name": "Traveller / Participant",
+            "permissions": [
+              "View trip and itinerary",
+              "Participate in chat",
+              "Use AI assistant",
+              "Suggest edits (subject to approval)"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Notifications & Updates",
+        "description": "Informs users of key actions/events.",
+        "features": [
+          "Push/email alerts for join requests, approvals, promotions",
+          "Notify when itinerary changes (for locked trips, notify Admin)",
+          "Daily reminders of upcoming trip events",
+          "Activity feed (e.g., 'Alice joined', 'Trip updated')"
+        ]
+      },
+      {
+        "name": "AI Assistant (Gemini)",
+        "description": "Smart contextual assistant within trip pages.",
+        "features": [
+          "Suggest local attractions, food, and accommodations",
+          "Customize responses based on weather, time, group size",
+          "Support conversational queries (e.g., 'Things to do at night in Manali')",
+          "Offer emergency contact or safety info on demand"
+        ]
+      },
+      {
+        "name": "Optional Enhancements",
+        "features": [
+          "Trip cost splitter & expense logging",
+          "Shared media album (upload + tag people)",
+          "Live location sharing during trip window (opt-in)",
+          "Post-trip feedback and anonymous safety review"
+        ]
+      }
+    ],
+    "nonFunctionalRequirements": [
+      "Responsive design for desktop and mobile browsers",
+      "Fast load times (SSR/ISR with Next.js)",
+      "Rate-limited AI API queries to manage costs",
+      "User data encryption and secure auth handling",
+      "Scalable real-time chat backend",
+      "GDPR-style privacy compliance"
+    ],
+    "outOfScopeForMVP": [
+      "Full-fledged payment system or ticketing",
+      "Offline mode",
+      "Full native mobile app (PWA suggested instead)"
+    ]
+  }
+}

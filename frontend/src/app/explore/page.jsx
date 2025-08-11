@@ -34,20 +34,7 @@ export default function ExplorePage() {
       const response = await tripApi.getTrips(filters);
       
       if (response.success) {
-        const trips = response.data.trips || [];
-        
-        // Fetch cities for each trip and embed them in trip objects
-        const tripsWithCities = await Promise.all(
-          trips.map(async (trip) => {
-            const cities = await fetchTripCities(trip.id);
-            return {
-              ...trip,
-              cities: cities
-            };
-          })
-        );
-        
-        setTrips(tripsWithCities);
+        setTrips(response.data.trips || []);
       } else {
         setError(response.error || 'Failed to load trips');
       }
@@ -59,36 +46,7 @@ export default function ExplorePage() {
     }
   };
 
-  // Function to fetch cities for a specific trip
-  const fetchTripCities = async (tripId) => {
-    try {
-      const response = await fetch(`/api/trips/${tripId}/cities`);
-      if (response.ok) {
-        const data = await response.json();
-        return data.cities || [];
-      }
-    } catch (error) {
-      console.error('Error fetching cities for trip:', tripId, error);
-    }
-    return [];
-  };
-
   const filterTags = ["Adventure", "Beach", "Mountains", "Culture", "Party", "Nature", "Trekking", "Peaceful", "Relaxation"];
-
-  // Function to get cities display for a trip
-  const getCitiesDisplay = (trip) => {
-    // If trip has cities array from trip_cities table
-    if (trip.cities && trip.cities.length > 0) {
-      const cityNames = trip.cities
-        .sort((a, b) => a.order_index - b.order_index)
-        .map(city => city.city_name);
-      
-      return cityNames.join(' → ');
-    }
-    
-    // Fallback to original location field
-    return trip.primary_destination || trip.location || trip.destination || 'Location TBA';
-  };
 
   const handleTagToggle = (tag) => {
     setSelectedFilters(prev => ({
@@ -299,9 +257,7 @@ export default function ExplorePage() {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                         </svg>
-                        <span className="truncate">
-                          {getCitiesDisplay(trip)}
-                        </span>
+                        <span className="truncate">{trip.location || trip.destination}</span>
                       </div>
                       <div className="flex items-center text-xs sm:text-sm text-gray-500">
                         <svg className="w-3 h-3 sm:w-4 sm:h-4 mr-1.5 sm:mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -318,7 +274,7 @@ export default function ExplorePage() {
                         <svg className="w-3 h-3 sm:w-4 sm:h-4 mr-1.5 sm:mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                         </svg>
-                        <span className="truncate">Hosted by {trip.creator_name || trip.host_name || 'Unknown'}</span>
+                        <span className="truncate">Hosted by {trip.host_name || 'Unknown'}</span>
                       </div>
                     </div>
                     
