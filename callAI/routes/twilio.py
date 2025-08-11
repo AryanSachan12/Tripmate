@@ -15,7 +15,6 @@ import asyncio
 
 router = APIRouter(prefix="/twilio", tags=["twilio"]) 
 
-# State
 TEXT = ""
 AUDIO_FILE = "twilio_audio.wav"
 AUDIO_BUFFER = bytearray()
@@ -23,16 +22,14 @@ BUFFER_DURATION = 8
 FILE_NO = 0
 STREAM_SID = ""
 
-# Whisper ASR
 model = whisper.load_model("small")
 
-# Twilio
 TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID")
 TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN")
 TWILIO_PHONE_NUMBER = os.getenv("TWILIO_PHONE_NUMBER")
 client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
 
-# Gemini
+
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 WS_URL = os.getenv("TWILIO_WS_URL", "wss://surely-tight-bullfrog.ngrok-free.app/twilio/ws")
 
@@ -100,7 +97,7 @@ async def handle_incoming_call():
   response.say("Hello, I’m your Tripmate travel assistant! Where and when would you like to travel?")
 
   start = Connect()
-  # Use env var TWILIO_WS_URL to point to your wss endpoint
+
   start.stream(url=WS_URL)
   response.append(start)
 
@@ -118,7 +115,7 @@ async def save_mulaw_to_wav(audio_bytes, filename=AUDIO_FILE):
 
 async def transcribe_audio(filename):
   global TEXT
-  # Transcribe with Whisper (lang auto)
+
   result = model.transcribe(filename)
   TEXT += "User: " + result["text"] + "\n"
 
