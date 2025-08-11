@@ -1,4 +1,4 @@
-// Utility functions for TripMate application
+// Utility functions for GlobeTrotter application
 
 export const generateInviteLink = (inviteId) => {
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || window.location.origin;

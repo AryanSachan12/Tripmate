@@ -192,11 +192,29 @@ export async function POST(request) {
     const tripData = await request.json()
 
     // Validate required fields
-    const requiredFields = ['title', 'location', 'start_date', 'end_date', 'max_members']
+    const requiredFields = ['title', 'start_date', 'end_date', 'max_members']
     for (const field of requiredFields) {
       if (!tripData[field]) {
         return NextResponse.json(
           { error: `${field} is required` },
+          { status: 400 }
+        )
+      }
+    }
+
+    // Validate cities data
+    if (!tripData.cities || !Array.isArray(tripData.cities) || tripData.cities.length === 0) {
+      return NextResponse.json(
+        { error: 'At least one city is required' },
+        { status: 400 }
+      )
+    }
+
+    // Validate each city
+    for (const city of tripData.cities) {
+      if (!city.city_name) {
+        return NextResponse.json(
+          { error: 'City name is required for all cities' },
           { status: 400 }
         )
       }
@@ -208,11 +226,17 @@ export async function POST(request) {
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
     )
 
-    // Step 1: Create the trip
+    // Extract cities for processing
+    const { cities, ...restTripData } = tripData
+
+    // Step 1: Create the trip (with primary destination from first city)
     const { data: trip, error: tripError } = await supabase
       .from('trips')
       .insert({
-        ...tripData,
+        ...restTripData,
+        location: cities[0].city_name, // Keep for backward compatibility
+        primary_destination: cities[0].city_name,
+        total_cities: cities.length,
         created_by: user.id,
         current_members: 1, // Creator is automatically a member
         status: 'planning',
@@ -225,6 +249,31 @@ export async function POST(request) {
       console.error('Trip creation error:', tripError)
       return NextResponse.json(
         { error: tripError.message },
+        { status: 400 }
+      )
+    }
+
+    // Step 1.5: Insert cities for the trip
+    const cityInserts = cities.map((city, index) => ({
+      trip_id: trip.id,
+      city_name: city.city_name,
+      country: city.country || null,
+      order_index: index,
+      arrival_date: city.arrival_date || null,
+      departure_date: city.departure_date || null,
+      notes: city.notes || null
+    }))
+
+    const { error: citiesError } = await supabase
+      .from('trip_cities')
+      .insert(cityInserts)
+
+    if (citiesError) {
+      // Rollback trip creation if cities insertion fails
+      await supabase.from('trips').delete().eq('id', trip.id)
+      console.error('Cities creation error:', citiesError)
+      return NextResponse.json(
+        { error: `Failed to add cities: ${citiesError.message}` },
         { status: 400 }
       )
     }

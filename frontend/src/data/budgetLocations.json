@@ -1,0 +1,117 @@
+[
+  {
+    "name": "Varanasi",
+    "location": "Varanasi, Uttar Pradesh",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/6/64/Dasaswamedh_Ghat..jpg",
+    "description": "One of the world's oldest living cities, Varanasi is a spiritual hub along the banks of the Ganges, known for its ghats, temples, and evening Ganga Aarti.",
+    "bestTimeToVisit": "October to March",
+    "activities": [
+      "Evening Ganga Aarti at Dashashwamedh Ghat",
+      "Boat ride on the Ganges",
+      "Visit Kashi Vishwanath Temple",
+      "Walk through the old city lanes"
+    ],
+    "tags": ["Spiritual", "Culture", "Budget"],
+    "startingPrice": 2500,
+    "maxPrice": 5000,
+    "estimatedBudget": {
+      "accommodation": 1500,
+      "food": 1000,
+      "transportation": 800,
+      "activities": 1200,
+      "total": 4500
+    }
+  },
+  {
+    "name": "Pondicherry",
+    "location": "Puducherry",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/d/d1/Rock_Beach%2C_in_Pondicherry_10.jpg",
+    "description": "A charming coastal town with French colonial architecture, peaceful beaches, and affordable cafes.",
+    "bestTimeToVisit": "October to February",
+    "activities": [
+      "Stroll along Rock Beach",
+      "Explore French Quarter",
+      "Visit Auroville",
+      "Try budget-friendly French-Indian fusion food"
+    ],
+    "tags": ["Beach", "Culture", "Budget"],
+    "startingPrice": 4000,
+    "maxPrice": 7000,
+    "estimatedBudget": {
+      "accommodation": 2000,
+      "food": 1500,
+      "transportation": 1200,
+      "activities": 1300,
+      "total": 6000
+    }
+  },
+  {
+    "name": "Rishikesh",
+    "location": "Rishikesh, Uttarakhand",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/1/1f/Front_entrance_of_the_Parmarth_Niketan%2C_in_Rishikesh%2C_Uttarakhand.jpg",
+    "description": "The yoga capital of the world, Rishikesh offers affordable stays, spiritual vibes, and adventure activities by the Ganges.",
+    "bestTimeToVisit": "September to November, March to May",
+    "activities": [
+      "Attend free yoga sessions",
+      "Walk on Laxman Jhula",
+      "River rafting",
+      "Ganga Aarti at Triveni Ghat"
+    ],
+    "tags": ["Adventure", "Spiritual", "Budget"],
+    "startingPrice": 3500,
+    "maxPrice": 6000,
+    "estimatedBudget": {
+      "accommodation": 1800,
+      "food": 1200,
+      "transportation": 1000,
+      "activities": 1500,
+      "total": 5500
+    }
+  },
+  {
+    "name": "Pushkar",
+    "location": "Pushkar, Rajasthan",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/7/73/20191214_Zach%C3%B3d_s%C5%82o%C5%84ca_nad_jeziorem_Puszkar_1721_8613.jpg",
+    "description": "A small desert town famous for its holy lake, vibrant bazaars, and the annual Pushkar Camel Fair.",
+    "bestTimeToVisit": "October to March",
+    "activities": [
+      "Visit Brahma Temple",
+      "Walk around Pushkar Lake",
+      "Shop at local bazaars",
+      "Camel safari in nearby dunes"
+    ],
+    "tags": ["Culture", "Shopping", "Budget"],
+    "startingPrice": 4000,
+    "maxPrice": 7000,
+    "estimatedBudget": {
+      "accommodation": 2200,
+      "food": 1200,
+      "transportation": 1000,
+      "activities": 1600,
+      "total": 6000
+    }
+  },
+  {
+    "name": "McLeod Ganj",
+    "location": "Dharamshala, Himachal Pradesh",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/e/e7/Main_Street_Temple_-_McLeod_Ganj_-_Himachal_Pradesh_-_India_%2826207379983%29.jpg",
+    "description": "A peaceful hill station known for Tibetan culture, monasteries, and scenic treks, offering affordable guesthouses and cafes.",
+    "bestTimeToVisit": "March to June, September to November",
+    "activities": [
+      "Visit Namgyal Monastery",
+      "Trek to Triund",
+      "Explore Tibetan markets",
+      "Enjoy budget-friendly cafes"
+    ],
+    "tags": ["Mountains", "Culture", "Budget"],
+    "startingPrice": 4500,
+    "maxPrice": 7500,
+    "estimatedBudget": {
+      "accommodation": 2500,
+      "food": 1500,
+      "transportation": 1500,
+      "activities": 2000,
+      "total": 7500
+    }
+  }
+]

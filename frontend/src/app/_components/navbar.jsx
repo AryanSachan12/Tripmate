@@ -23,9 +23,9 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-14 sm:h-16">
           {/* Logo and Brand */}
           <div className="flex items-center space-x-2">
-            <Image src="/logo.png" alt="TripMate Logo" width={40} height={40} className="sm:w-8 sm:h-8 rounded-lg" />
+            <Image src="/logo.png" alt="GlobeTrotter Logo" width={40} height={40} className="sm:w-8 sm:h-8 rounded-lg" />
             <Link href="/" className="text-lg sm:text-xl font-bold text-gray-900">
-              TripMate
+              GlobeTrotter
             </Link>
           </div>
 

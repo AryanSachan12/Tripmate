@@ -80,7 +80,7 @@ export default function AuthPage() {
         <div className="text-center">
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
             {currentView === 'login' && 'Welcome Back'}
-            {currentView === 'register' && 'Join TripMate'}
+            {currentView === 'register' && 'Join GlobeTrotter'}
             {currentView === 'verifyOTP' && 'Verify Your Email'}
             {currentView === 'forgotPassword' && 'Reset Password'}
             {currentView === 'resetPassword' && 'Create New Password'}

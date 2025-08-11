@@ -1,0 +1,224 @@
+[
+  {
+    "name": "Taj Mahal",
+    "activities": [
+      {
+        "name": "Guided Heritage Tour",
+        "imageUrl": "https://images.unsplash.com/photo-1564507592333-c60657eea523?w=400&h=300&fit=crop"
+      },
+      {
+        "name": "Photography at Sunrise",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/8/87/Taj_Mahal_Agra_India_2025_06.jpg"
+      },
+      {
+        "name": "Visit Agra Fort",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/8/8d/Agra_03-2016_16_Agra_Fort.jpg"
+      }
+    ]
+  },
+  {
+    "name": "Jaipur - The Pink City",
+    "activities": [
+      {
+        "name": "Explore Hawa Mahal",
+        "imageUrl": "https://images.unsplash.com/photo-1477587458883-47145ed94245?w=400&h=300&fit=crop"
+      },
+      {
+        "name": "Shop at Johari Bazaar",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/5/5f/Johari_Bazar.jpg"
+      }
+    ]
+  },
+  {
+    "name": "Goa Beaches",
+    "activities": [
+      {
+        "name": "Beach Hopping (Baga, Anjuna, Palolem)",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/6/6e/Cola_Beach_Bay_South_Goa_Jan19_DSC06186.jpg"
+      },
+      {
+        "name": "Water Sports",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/a/a4/Jetboot_Jetski_DM_2007_Krautsand_2.jpg"
+      },
+      {
+        "name": "Night Markets",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/3/32/Dwarka_Resort_Night_Cola_Goa_Jan19_DSC00069.jpg"
+      },
+      {
+        "name": "Seafood Tasting",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/f/f8/Barbecue_Seafood_Platter_-_Sterling_Holidays_Bardez_-_North_Goa_-_20180913_152413.jpg"
+      }
+    ]
+  },
+  {
+    "name": "Manali - Hill Station Paradise",
+    "activities": [
+      {
+        "name": "Solang Valley Adventures",
+        "imageUrl": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop"
+      },
+      {
+        "name": "Rohtang Pass Excursion",
+        "imageUrl": "https://images.unsplash.com/photo-1551632811-561732d1e306?w=400&h=300&fit=crop"
+      },
+      {
+        "name": "Hadimba Temple Visit",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/7/74/People_Visiting_%22Hadimba_Temple%22_Manali.jpg"
+      }
+    ]
+  },
+  {
+    "name": "Kerala Backwaters",
+    "activities": [
+      {
+        "name": "Houseboat Cruise",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/b/b5/Kerela_Dawn.jpg"
+      },
+      {
+        "name": "Munnar Tea Gardens",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/2/27/Landscape_view_of_Echo_Point_Munnar%2C_Kerela%2C_India.jpg"
+      },
+      {
+        "name": "Ayurvedic Spa Treatment",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/2/2a/Spa_interiors_-_1.jpg"
+      }
+    ]
+  },
+  {
+    "name": "Varanasi - Spiritual Capital",
+    "activities": [
+      {
+        "name": "Ganga Aarti Experience",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/e/e7/Ganga_Arti_at_Rishikesh.jpg"
+      },
+      {
+        "name": "Sunrise Boat Ride",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/0/0d/Sunrise_boat_ride%2C_Varanasi.jpg"
+      },
+      {
+        "name": "Ancient Temples Tour",
+        "imageUrl": "https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?w=400&h=300&fit=crop"
+      }
+    ]
+  },
+  {
+    "name": "Rishikesh - Adventure Hub",
+    "activities": [
+      {
+        "name": "White Water Rafting",
+        "imageUrl": "https://images.unsplash.com/photo-1544197150-b99a580bb7a8?w=400&h=300&fit=crop"
+      },
+      {
+        "name": "Yoga and Meditation",
+        "imageUrl": "https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=400&h=300&fit=crop"
+      },
+      {
+        "name": "Visit Laxman Jhula",
+        "imageUrl": "https://images.unsplash.com/photo-1609920658906-8223bd289001?w=400&h=300&fit=crop"
+      }
+    ]
+  },
+  {
+    "name": "Udaipur - City of Lakes",
+    "activities": [
+      {
+        "name": "City Palace Tour",
+        "imageUrl": "https://images.unsplash.com/photo-1477587458883-47145ed94245?w=400&h=300&fit=crop"
+      },
+      {
+        "name": "Lake Pichola Boat Ride",
+        "imageUrl": "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop"
+      },
+      {
+        "name": "Jag Mandir Visit",
+        "imageUrl": "https://images.unsplash.com/photo-1582510003544-4d00b7f74220?w=400&h=300&fit=crop"
+      }
+    ]
+  },
+  {
+    "name": "Mysore - Palace City",
+    "activities": [
+      {
+        "name": "Mysore Palace Illumination",
+        "imageUrl": "https://images.unsplash.com/photo-1582510003544-4d00b7f74220?w=400&h=300&fit=crop"
+      },
+      {
+        "name": "Chamundi Hills Trek",
+        "imageUrl": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop"
+      },
+      {
+        "name": "Devaraja Market Visit",
+        "imageUrl": "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop"
+      }
+    ]
+  },
+  {
+    "name": "Hampi - Ancient Ruins",
+    "activities": [
+      {
+        "name": "Vijayanagara Empire Exploration",
+        "imageUrl": "https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?w=400&h=300&fit=crop"
+      },
+      {
+        "name": "Coracle Ride",
+        "imageUrl": "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop"
+      },
+      {
+        "name": "Boulder Climbing",
+        "imageUrl": "https://images.unsplash.com/photo-1522163182402-834f871fd851?w=400&h=300&fit=crop"
+      }
+    ]
+  },
+  {
+    "name": "Darjeeling - Queen of Hills",
+    "activities": [
+      {
+        "name": "Toy Train Ride",
+        "imageUrl": "https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?w=400&h=300&fit=crop"
+      },
+      {
+        "name": "Tiger Hill Sunrise",
+        "imageUrl": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop"
+      },
+      {
+        "name": "Tea Garden Tours",
+        "imageUrl": "https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?w=400&h=300&fit=crop"
+      }
+    ]
+  },
+  {
+    "name": "Pushkar - Sacred Lake City",
+    "activities": [
+      {
+        "name": "Pushkar Lake Aarti",
+        "imageUrl": "https://images.unsplash.com/photo-1609920658906-8223bd289001?w=400&h=300&fit=crop"
+      },
+      {
+        "name": "Camel Safari",
+        "imageUrl": "https://images.unsplash.com/photo-1518548419970-58e3b4079ab2?w=400&h=300&fit=crop"
+      },
+      {
+        "name": "Brahma Temple Visit",
+        "imageUrl": "https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?w=400&h=300&fit=crop"
+      }
+    ]
+  },
+  {
+    "name": "McLeod Ganj - Little Lhasa",
+    "activities": [
+      {
+        "name": "Triund Trek",
+        "imageUrl": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop"
+      },
+      {
+        "name": "Dalai Lama Temple Visit",
+        "imageUrl": "https://images.unsplash.com/photo-1609920658906-8223bd289001?w=400&h=300&fit=crop"
+      },
+      {
+        "name": "Tibetan Market Shopping",
+        "imageUrl": "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop"
+      }
+    ]
+  }
+]
+

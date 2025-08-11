@@ -3,10 +3,10 @@ export default function About() {
     <div className="min-h-screen bg-gray-50 pt-16 sm:pt-20">
       <div className="max-w-4xl mx-auto px-3 sm:px-4 lg:px-8 py-8 sm:py-12">
         <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm p-6 sm:p-8 lg:p-12">
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-4 sm:mb-6 text-center">About TripMate</h1>
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-4 sm:mb-6 text-center">About GlobeTrotter</h1>
           <div className="prose prose-sm sm:prose-base lg:prose-lg max-w-none">
             <p className="text-gray-600 text-base sm:text-lg leading-relaxed mb-6 text-center">
-              TripMate is your ultimate travel companion for discovering, planning, and sharing amazing adventures with fellow travelers around the world.
+              GlobeTrotter is your ultimate travel companion for discovering, planning, and sharing amazing adventures with fellow travelers around the world.
             </p>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 mt-8 sm:mt-12">

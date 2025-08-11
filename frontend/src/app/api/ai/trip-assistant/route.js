@@ -33,7 +33,7 @@ export async function POST(request) {
 
     // Create the prompt with context
     const prompt = `
-You are a knowledgeable and friendly AI travel assistant for TripMate, a trip planning application. You have access to detailed information about the user's specific trip.
+You are a knowledgeable and friendly AI travel assistant for GlobeTrotter, a trip planning application. You have access to detailed information about the user's specific trip.
 
 TRIP CONTEXT:
 ${contextString}
