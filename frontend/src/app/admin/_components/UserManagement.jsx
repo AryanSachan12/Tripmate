@@ -15,11 +15,33 @@ export default function UserManagement({ adminData }) {
   const [showUserModal, setShowUserModal] = useState(false);
   const [showSuspendModal, setShowSuspendModal] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
+  const [insurancePredictions, setInsurancePredictions] = useState({});
+  const [predictionLoading, setPredictionLoading] = useState({});
   const usersPerPage = 20;
 
   useEffect(() => {
     loadUsers();
+    loadInsurancePredictions();
   }, [currentPage, sortBy, sortOrder, searchTerm]);
+
+  const loadInsurancePredictions = async () => {
+    try {
+      const response = await fetch('/api/insurance-prediction');
+      if (response.ok) {
+        const data = await response.json();
+        const predictionsMap = {};
+        data.predictions?.forEach(pred => {
+          predictionsMap[pred.user_id] = pred;
+        });
+        setInsurancePredictions(predictionsMap);
+      } else {
+        console.error('Failed to load insurance predictions:', response.status, response.statusText);
+      }
+    } catch (error) {
+      console.error('Error loading insurance predictions:', error);
+      // Don't show alert for this error as it's not critical for basic functionality
+    }
+  };
 
   const loadUsers = async () => {
     try {
@@ -177,6 +199,113 @@ export default function UserManagement({ adminData }) {
     }
   };
 
+  const handleInsurancePrediction = async (user) => {
+    if (predictionLoading[user.id]) return;
+    
+    try {
+      setPredictionLoading(prev => ({...prev, [user.id]: true}));
+      
+      // Generate random user data
+      const randomData = generateRandomUserData();
+      
+      const response = await fetch('/api/insurance-prediction', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: user.id,
+          userData: randomData,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Prediction failed');
+      }
+
+      const data = await response.json();
+      
+      // Update local predictions state
+      setInsurancePredictions(prev => ({
+        ...prev,
+        [user.id]: data.data
+      }));
+
+      return data; // Return the result for bulk processing
+      
+    } catch (error) {
+      console.error('Error making insurance prediction:', error);
+      throw error; // Re-throw for bulk processing to handle
+    } finally {
+      setPredictionLoading(prev => ({...prev, [user.id]: false}));
+    }
+  };
+
+  const handleSinglePrediction = async (user) => {
+    try {
+      await handleInsurancePrediction(user);
+      // Success - no need for alert as the UI updates immediately
+    } catch (error) {
+      alert('Failed to make prediction: ' + error.message);
+    }
+  };
+
+  const generateRandomUserData = () => {
+    return {
+      age: Math.floor(Math.random() * (50 - 18 + 1)) + 18, // Age: 18-50
+      graduateOrNot: Math.random() > 0.4 ? 1 : 0, // 60% chance of being graduate
+      annualIncome: Math.floor(Math.random() * (1000000 - 500000 + 1)) + 500000,
+      familyMembers: Math.floor(Math.random() * 6) + 1, // Family members: 1-6
+      frequentFlyer: Math.random() > 0.7 ? 1 : 0, // 30% chance of being frequent flyer
+      everTravelledAbroad: Math.random() > 0.5 ? 1 : 0, // 50% chance of international travel
+    };
+  };
+
+  const handleBulkPredict = async () => {
+    const usersWithoutPredictions = users.filter(user => !insurancePredictions[user.id]);
+    
+    if (usersWithoutPredictions.length === 0) {
+      alert('All users already have predictions!');
+      return;
+    }
+
+    if (!confirm(`Generate predictions for ${usersWithoutPredictions.length} users?`)) {
+      return;
+    }
+
+    const batchSize = 3; // Process 3 users at a time to avoid overwhelming the API
+    for (let i = 0; i < usersWithoutPredictions.length; i += batchSize) {
+      const batch = usersWithoutPredictions.slice(i, i + batchSize);
+      
+      // Set loading state for batch
+      setPredictionLoading(prev => {
+        const newState = { ...prev };
+        batch.forEach(user => {
+          newState[user.id] = true;
+        });
+        return newState;
+      });
+
+      // Process batch in parallel
+      const promises = batch.map(user => 
+        handleInsurancePrediction(user).catch(error => {
+          console.error(`Failed to predict for user ${user.email}:`, error);
+          return null;
+        })
+      );
+
+      await Promise.all(promises);
+      
+      // Small delay between batches
+      if (i + batchSize < usersWithoutPredictions.length) {
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
+    }
+
+    alert(`Bulk prediction completed for ${usersWithoutPredictions.length} users!`);
+  };
+
   const totalPages = Math.ceil(totalUsers / usersPerPage);
 
   const SortIcon = ({ column }) => {
@@ -270,6 +399,16 @@ export default function UserManagement({ adminData }) {
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-medium text-gray-900">User Management</h3>
           <div className="flex items-center space-x-4">
+            <button
+              onClick={handleBulkPredict}
+              disabled={Object.values(predictionLoading).some(loading => loading)}
+              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              Bulk Predict All
+            </button>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <svg
@@ -341,6 +480,9 @@ export default function UserManagement({ adminData }) {
                   </div>
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Insurance Prediction
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
@@ -363,6 +505,9 @@ export default function UserManagement({ adminData }) {
                       <div className="h-4 bg-gray-200 rounded animate-pulse w-24"></div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="h-4 bg-gray-200 rounded animate-pulse w-20"></div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
                       <div className="h-4 bg-gray-200 rounded animate-pulse w-16"></div>
                     </td>
                   </tr>
@@ -370,7 +515,7 @@ export default function UserManagement({ adminData }) {
               ) : users.length === 0 ? (
                 <tr>
                   <td
-                    colSpan="5"
+                    colSpan="6"
                     className="px-6 py-4 text-center text-gray-500"
                   >
                     No users found
@@ -417,6 +562,50 @@ export default function UserManagement({ adminData }) {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {formatDate(user.last_login_at)}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {insurancePredictions[user.id] ? (
+                        <div className="flex flex-col space-y-1">
+                          <span
+                            className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                              insurancePredictions[user.id].prediction === 1
+                                ? "bg-green-100 text-green-800"
+                                : "bg-red-100 text-red-800"
+                            }`}
+                          >
+                            {insurancePredictions[user.id].prediction === 1 ? "Will Buy" : "Won't Buy"}
+                          </span>
+                          <span className="text-xs text-gray-500">
+                            {(insurancePredictions[user.id].probability * 100).toFixed(1)}% confidence
+                          </span>
+                          <div className="text-xs text-gray-400 mt-1">
+                            Age: {insurancePredictions[user.id].age}, 
+                            Income: ${insurancePredictions[user.id].annual_income?.toLocaleString()}
+                          </div>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => handleSinglePrediction(user)}
+                          disabled={predictionLoading[user.id]}
+                          className={`inline-flex items-center px-3 py-1 text-xs font-medium rounded border transition-colors ${
+                            predictionLoading[user.id]
+                              ? "bg-gray-100 text-gray-400 cursor-not-allowed border-gray-300"
+                              : "border-blue-300 text-blue-700 hover:bg-blue-50 hover:border-blue-400"
+                          }`}
+                        >
+                          {predictionLoading[user.id] ? (
+                            <>
+                              <svg className="animate-spin -ml-1 mr-1 h-3 w-3 text-gray-400" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                              </svg>
+                              Predicting...
+                            </>
+                          ) : (
+                            "Generate Prediction"
+                          )}
+                        </button>
+                      )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <button 
@@ -474,7 +663,7 @@ export default function UserManagement({ adminData }) {
       </div>
 
       {/* User Stats Summary */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6">
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center">
             <div className="flex-shrink-0">
@@ -593,6 +782,45 @@ export default function UserManagement({ adminData }) {
                   }).length
                 }
               </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg shadow p-6">
+          <div className="flex items-center">
+            <div className="flex-shrink-0">
+              <div className="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center">
+                <svg
+                  className="w-5 h-5 text-emerald-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M9 12l2 2 4-4m5.25-2.25L21 9l-3 3-3-3 1.5-1.5z"
+                  />
+                </svg>
+              </div>
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-500">
+                Insurance Predictions
+              </p>
+              <p className="text-2xl font-bold text-gray-900">
+                {Object.keys(insurancePredictions).length}
+              </p>
+              <div className="text-xs text-gray-500 mt-1">
+                <span className="text-green-600">
+                  {Object.values(insurancePredictions).filter(p => p.prediction === 1).length} will buy
+                </span>
+                {" • "}
+                <span className="text-red-600">
+                  {Object.values(insurancePredictions).filter(p => p.prediction === 0).length} won't buy
+                </span>
+              </div>
             </div>
           </div>
         </div>
