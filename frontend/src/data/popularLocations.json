@@ -1,0 +1,117 @@
+[
+  {
+    "name": "Taj Mahal",
+    "location": "Agra, Uttar Pradesh",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/7/74/Taj_Mahal%2C_Agra%2C_India_edit2.jpg",
+    "description": "A UNESCO World Heritage site and one of the Seven Wonders of the World, the Taj Mahal is a stunning white marble mausoleum built by Emperor Shah Jahan in memory of his wife Mumtaz Mahal.",
+    "bestTimeToVisit": "October to March",
+    "activities": [
+      "Guided heritage tour",
+      "Photography",
+      "Yamuna river boat ride",
+      "Visit Agra Fort"
+    ],
+    "tags": ["Heritage", "Architecture", "Romantic"],
+    "startingPrice": 8000,
+    "maxPrice": 15000,
+    "estimatedBudget": {
+      "accommodation": 4000,
+      "food": 2500,
+      "transportation": 2000,
+      "activities": 3500,
+      "total": 12000
+    }
+  },
+  {
+    "name": "Jaipur - The Pink City",
+    "location": "Jaipur, Rajasthan",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/4/41/East_facade_Hawa_Mahal_Jaipur_from_ground_level_%28July_2022%29_-_img_01.jpg",
+    "description": "Known for its pink-colored buildings and royal palaces, Jaipur offers a glimpse into the rich history and culture of Rajasthan.",
+    "bestTimeToVisit": "October to March",
+    "activities": [
+      "Explore Hawa Mahal",
+      "Visit Amber Fort",
+      "Shop at Johari Bazaar",
+      "Try traditional Rajasthani cuisine"
+    ],
+    "tags": ["Heritage", "Culture", "Shopping"],
+    "startingPrice": 9000,
+    "maxPrice": 16000,
+    "estimatedBudget": {
+      "accommodation": 4500,
+      "food": 3000,
+      "transportation": 2500,
+      "activities": 3000,
+      "total": 13000
+    }
+  },
+  {
+    "name": "Goa Beaches",
+    "location": "Goa",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/a/a6/Baga_Beach_%2816877504013%29.jpg",
+    "description": "Goa is famous for its golden sandy beaches, vibrant nightlife, Portuguese heritage, and relaxed coastal vibes.",
+    "bestTimeToVisit": "November to February",
+    "activities": [
+      "Beach hopping (Baga, Anjuna, Palolem)",
+      "Water sports",
+      "Night markets",
+      "Visit Old Goa churches"
+    ],
+    "tags": ["Beach", "Nightlife", "Adventure"],
+    "startingPrice": 10000,
+    "maxPrice": 20000,
+    "estimatedBudget": {
+      "accommodation": 6000,
+      "food": 4000,
+      "transportation": 3000,
+      "activities": 4000,
+      "total": 17000
+    }
+  },
+  {
+    "name": "Kerala Backwaters",
+    "location": "Alleppey, Kerala",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/a/a6/Kerala_backwaters%2C_Canal%2C_Palm_trees%2C_India.jpg",
+    "description": "A network of tranquil canals, lakes, and rivers fringed by coconut trees, offering a serene escape in traditional houseboats.",
+    "bestTimeToVisit": "November to February",
+    "activities": [
+      "Houseboat cruise",
+      "Bird watching",
+      "Village walks",
+      "Ayurvedic spa"
+    ],
+    "tags": ["Nature", "Relaxation", "Scenic"],
+    "startingPrice": 12000,
+    "maxPrice": 22000,
+    "estimatedBudget": {
+      "accommodation": 8000,
+      "food": 3500,
+      "transportation": 2500,
+      "activities": 6000,
+      "total": 20000
+    }
+  },
+  {
+    "name": "Leh-Ladakh",
+    "location": "Ladakh, Jammu & Kashmir",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/a/a1/Leh_Palace%2C_Ladakh%2C_India.jpg",
+    "description": "A high-altitude desert region known for its breathtaking mountain landscapes, Buddhist monasteries, and adventure activities.",
+    "bestTimeToVisit": "June to September",
+    "activities": [
+      "Motorbike road trip",
+      "Trekking",
+      "Visit Pangong Lake",
+      "Explore monasteries"
+    ],
+    "tags": ["Adventure", "Mountains", "Scenic"],
+    "startingPrice": 15000,
+    "maxPrice": 30000,
+    "estimatedBudget": {
+      "accommodation": 8000,
+      "food": 4000,
+      "transportation": 8000,
+      "activities": 6000,
+      "total": 26000
+    }
+  }
+]

@@ -105,7 +105,7 @@ export default function Profile() {
   const stats = {
     tripsCompleted: userTrips.filter(trip => trip.status === 'completed').length,
     placesVisited: [...new Set(userTrips.map(trip => trip.location).filter(Boolean))].length,
-    friendsConnected: "Coming Soon"
+    upcomingTrips: userTrips.filter(trip => trip.status === 'planning' || trip.status === 'active' || trip.status === 'upcoming' || (!trip.status)).length
   };
 
   // Get recent trips (last 3 trips, sorted by date)
@@ -121,7 +121,7 @@ export default function Profile() {
         `${Math.ceil((new Date(trip.end_date) - new Date(trip.start_date)) / (1000 * 60 * 60 * 24))} days` : 
         'Duration TBA',
       image: trip.cover_image_url || "/logo.png",
-      status: trip.status || 'upcoming'
+      status: trip.status || 'planning'
     }));
 
   const handleInputChange = (field, value) => {
@@ -264,22 +264,22 @@ export default function Profile() {
 
             {/* Profile Info */}
             <div className="flex-1 text-center sm:text-left w-full">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
-                <div className="mb-4 sm:mb-0">
+              <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between mb-4 gap-4">
+                <div className="flex-1">
                   {isEditing ? (
                     <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 mb-2">
                       <input
                         type="text"
                         value={profileData.firstName}
                         onChange={(e) => handleInputChange('firstName', e.target.value)}
-                        className="text-xl sm:text-2xl font-bold bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 text-center sm:text-left"
+                        className="text-xl sm:text-2xl font-bold bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 text-center sm:text-left focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         placeholder="First Name"
                       />
                       <input
                         type="text"
                         value={profileData.lastName}
                         onChange={(e) => handleInputChange('lastName', e.target.value)}
-                        className="text-xl sm:text-2xl font-bold bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 text-center sm:text-left"
+                        className="text-xl sm:text-2xl font-bold bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 text-center sm:text-left focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         placeholder="Last Name"
                       />
                     </div>
@@ -294,7 +294,7 @@ export default function Profile() {
                       type="email"
                       value={profileData.email}
                       onChange={(e) => handleInputChange('email', e.target.value)}
-                      className="w-full text-gray-600 bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 mb-2 text-center sm:text-left"
+                      className="w-full max-w-md text-gray-600 bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 mb-2 text-center sm:text-left focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   ) : (
                     <p className="text-gray-600 mb-2 text-sm sm:text-base">{profileData.email}</p>
@@ -310,7 +310,7 @@ export default function Profile() {
                         type="text"
                         value={profileData.location}
                         onChange={(e) => handleInputChange('location', e.target.value)}
-                        className="bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 text-center sm:text-left"
+                        className="bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 text-center sm:text-left max-w-xs focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         placeholder="Location"
                       />
                     ) : (
@@ -319,27 +319,36 @@ export default function Profile() {
                   </div>
                 </div>
 
-                <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
+                <div className="flex flex-col sm:flex-row gap-3 sm:items-center lg:flex-shrink-0">
                   {isEditing ? (
                     <>
                       <button
                         onClick={() => setIsEditing(false)}
-                        className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors text-sm sm:text-base"
+                        className="px-5 py-2.5 border-2 border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 text-sm font-medium shadow-sm hover:shadow-md flex items-center justify-center gap-2 min-w-[120px]"
                       >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
                         Cancel
                       </button>
                       <button
                         onClick={handleSave}
-                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm sm:text-base"
+                        className="px-5 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all duration-200 text-sm font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center gap-2 min-w-[140px]"
                       >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
                         Save Changes
                       </button>
                     </>
                   ) : (
                     <button
                       onClick={() => setIsEditing(true)}
-                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm sm:text-base"
+                      className="px-6 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all duration-200 text-sm font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center gap-2 min-w-[140px]"
                     >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                      </svg>
                       Edit Profile
                     </button>
                   )}
@@ -363,16 +372,16 @@ export default function Profile() {
               {/* Stats */}
               <div className="grid grid-cols-3 gap-3 sm:gap-4">
                 <div className="text-center bg-blue-50 rounded-lg p-3 sm:p-4">
-                  <div className="text-xl sm:text-2xl font-bold text-blue-600">{stats.tripsCompleted}</div>
-                  <div className="text-xs sm:text-sm text-gray-500">Trips Completed</div>
+                  <div className="text-xl sm:text-2xl font-bold text-blue-600">{stats.upcomingTrips}</div>
+                  <div className="text-xs sm:text-sm text-gray-500">Upcoming Trips</div>
                 </div>
                 <div className="text-center bg-green-50 rounded-lg p-3 sm:p-4">
-                  <div className="text-xl sm:text-2xl font-bold text-green-600">{stats.placesVisited}</div>
-                  <div className="text-xs sm:text-sm text-gray-500">Places Visited</div>
+                  <div className="text-xl sm:text-2xl font-bold text-green-600">{stats.tripsCompleted}</div>
+                  <div className="text-xs sm:text-sm text-gray-500">Trips Completed</div>
                 </div>
-                <div className="text-center bg-orange-50 rounded-lg p-3 sm:p-4">
-                  <div className="text-xl sm:text-2xl font-bold text-orange-600">{stats.friendsConnected}</div>
-                  <div className="text-xs sm:text-sm text-gray-500">Friends Connected</div>
+                <div className="text-center bg-purple-50 rounded-lg p-3 sm:p-4">
+                  <div className="text-xl sm:text-2xl font-bold text-purple-600">{stats.placesVisited}</div>
+                  <div className="text-xs sm:text-sm text-gray-500">Places Visited</div>
                 </div>
               </div>
             </div>
@@ -522,11 +531,14 @@ export default function Profile() {
                         <p className="text-xs text-gray-400">{trip.duration}</p>
                       </div>
                       <span className={`px-2 py-1 text-xs rounded-full flex-shrink-0 ${
-                        trip.status === 'completed' ? 'bg-green-100 text-green-800' :
+                        trip.status === 'completed' ? 'bg-gray-100 text-gray-800' :
+                        trip.status === 'active' ? 'bg-green-100 text-green-800' :
+                        trip.status === 'planning' ? 'bg-blue-100 text-blue-800' :
+                        trip.status === 'cancelled' ? 'bg-red-100 text-red-800' :
                         trip.status === 'upcoming' ? 'bg-blue-100 text-blue-800' :
-                        'bg-gray-100 text-gray-800'
+                        'bg-blue-100 text-blue-800'
                       }`}>
-                        {trip.status}
+                        {trip.status.charAt(0).toUpperCase() + trip.status.slice(1)}
                       </span>
                     </div>
                   ))

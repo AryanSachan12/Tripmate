@@ -188,7 +188,7 @@ Please request a new verification email.`);
                 </svg>
               </div>
               <h2 className="text-xl font-semibold text-gray-900 mb-2">Email Verified Successfully!</h2>
-              <p className="text-gray-600 mb-6">Welcome to TripMate! You're being redirected to your dashboard...</p>
+              <p className="text-gray-600 mb-6">Welcome to GlobeTrotter! You're being redirected to your dashboard...</p>
               <div className="flex items-center justify-center space-x-2 text-blue-600">
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
                 <span className="text-sm">Redirecting...</span>
@@ -238,8 +238,8 @@ Please request a new verification email.`);
                 </button>
                 <p className="text-xs text-gray-500">
                   Need help? Contact support at{' '}
-                  <a href="mailto:support@tripmate.com" className="text-blue-600 hover:text-blue-500">
-                    support@tripmate.com
+                  <a href="mailto:support@globetrotter.com" className="text-blue-600 hover:text-blue-500">
+                    support@globetrotter.com
                   </a>
                 </p>
               </div>

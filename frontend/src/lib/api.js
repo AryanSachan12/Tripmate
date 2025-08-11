@@ -1,4 +1,4 @@
-// Client-side API utilities for TripMate
+// Client-side API utilities for GlobeTrotter
 // All functions use Next.js API routes instead of direct Supabase calls
 import { supabase } from './supabase'
 import clientCache from './client-cache'

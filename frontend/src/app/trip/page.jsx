@@ -11,10 +11,43 @@ function TripPageContent() {
   const { user, isAuthenticated } = useUser();
   const mode = searchParams.get('mode'); // 'create' for creation mode
   const tripId = searchParams.get('id'); // trip ID for viewing/editing
+  const copyData = searchParams.get('copy'); // encoded trip data for copying
+  const urlTitle = searchParams.get('title'); // pre-filled title from URL
+  const urlDestination = searchParams.get('destination'); // pre-filled destination from URL
   
   const [currentTrip, setCurrentTrip] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+
+  // Parse copy data if available
+  const parsedCopyData = copyData ? (() => {
+    try {
+      return JSON.parse(decodeURIComponent(copyData));
+    } catch (e) {
+      console.error('Failed to parse copy data:', e);
+      return null;
+    }
+  })() : null;
+
+  // Create initial data from URL parameters
+  const urlInitialData = (urlTitle || urlDestination) ? {
+    title: urlTitle || '',
+    cities: urlDestination ? [{
+      id: Date.now(),
+      city_name: urlDestination,
+      country: '',
+      arrival_date: '',
+      departure_date: '',
+      notes: ''
+    }] : [{
+      id: Date.now(),
+      city_name: '',
+      country: '',
+      arrival_date: '',
+      departure_date: '',
+      notes: ''
+    }]
+  } : null;
 
   useEffect(() => {
     // If we have a trip ID, fetch the trip data
@@ -112,7 +145,10 @@ function TripPageContent() {
   if (mode === 'create' && !currentTrip) {
     return (
       <div className="min-h-screen bg-gray-50 pt-16 sm:pt-20">
-        <TripCreateWizard onTripCreated={handleTripCreated} />
+        <TripCreateWizard 
+          onTripCreated={handleTripCreated} 
+          initialData={urlInitialData || parsedCopyData}
+        />
       </div>
     );
   }

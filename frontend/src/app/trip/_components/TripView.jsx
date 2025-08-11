@@ -11,6 +11,7 @@ import TripSettings from './TripSettings';
 import InviteLinkModal from './InviteLinkModal';
 import JoinRequestsManager from './JoinRequestsManager';
 import JoinRequestModal from './JoinRequestModal';
+import ExpenseManager from './ExpenseManager';
 
 export default function TripView({ trip, onTripUpdated }) {
   const [activeTab, setActiveTab] = useState('overview');
@@ -23,6 +24,8 @@ export default function TripView({ trip, onTripUpdated }) {
   const [isRequesting, setIsRequesting] = useState(false);
   const [isJoining, setIsJoining] = useState(false);
   const [wasRemoved, setWasRemoved] = useState(false);
+  const [tripCities, setTripCities] = useState([]);
+  const [imageError, setImageError] = useState(false);
   const { user } = useUser();
 
   // Format date utility
@@ -36,6 +39,53 @@ export default function TripView({ trip, onTripUpdated }) {
       minute: '2-digit'
     });
   };
+
+  // Function to fetch cities for this trip
+  const fetchTripCities = async () => {
+    if (!trip?.id || (trip.total_cities || 1) <= 1) return;
+
+    try {
+      const response = await fetch(`/api/trips/${trip.id}/cities`);
+      if (response.ok) {
+        const data = await response.json();
+        setTripCities(data.cities || []);
+      } else {
+        console.warn('Failed to fetch cities for trip:', response.status);
+      }
+    } catch (error) {
+      console.error('Error fetching trip cities:', error);
+    }
+  };
+
+  // Function to get cities display
+  const getCitiesDisplay = () => {
+    const totalCities = trip?.total_cities || 1;
+    
+    if (totalCities <= 1) {
+      return trip?.primary_destination || trip?.destination || trip?.location || 'Unknown Location';
+    }
+    
+    if (tripCities.length > 0) {
+      const cityNames = tripCities
+        .sort((a, b) => a.order_index - b.order_index)
+        .map(city => city.city_name);
+      
+      return cityNames.join(' → ');
+    }
+    
+    // Fallback while loading
+    const primaryDestination = trip?.primary_destination || trip?.destination || trip?.location || 'Location';
+    const additionalCount = Math.max(0, totalCities - 1);
+    return additionalCount > 0 ? `${primaryDestination} +${additionalCount} more` : primaryDestination;
+  };
+
+  // Load cities when trip changes
+  useEffect(() => {
+    if (trip?.id) {
+      fetchTripCities();
+      setImageError(false); // Reset image error when trip changes
+    }
+  }, [trip?.id, trip?.total_cities]);
 
   // Check user's relationship to this trip
   const isMember = trip?.userRole && trip.userRole !== 'None';
@@ -117,6 +167,7 @@ export default function TripView({ trip, onTripUpdated }) {
   const tabs = [
     { id: 'overview', name: 'Overview', icon: 'info' },
     { id: 'itinerary', name: 'Itinerary', icon: 'calendar' },
+    { id: 'expenses', name: 'Expenses', icon: 'money' },
     { id: 'chat', name: 'Chat', icon: 'chat' },
     { id: 'ai', name: 'AI Assistant', icon: 'ai' }
   ];
@@ -231,6 +282,18 @@ export default function TripView({ trip, onTripUpdated }) {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
           </svg>
         );
+      case 'money':
+        return (
+          <svg className={iconClass} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+          </svg>
+        );
+      case 'money':
+        return (
+          <svg className={iconClass} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+          </svg>
+        );
       case 'chat':
         return (
           <svg className={iconClass} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -256,10 +319,11 @@ export default function TripView({ trip, onTripUpdated }) {
             {/* Trip Header */}
             <div className="relative h-48 sm:h-64 rounded-xl sm:rounded-2xl overflow-hidden">
               <Image
-                src={trip.cover_image_url || trip.coverImage || '/logo.png'}
+                src={imageError ? '/placeholder.png' : (trip.cover_image_url || trip.coverImage || '/placeholder.png')}
                 alt={trip.title || 'Trip'}
                 fill
                 className="object-cover"
+                onError={() => setImageError(true)}
               />
               <div className="absolute inset-0 bg-black bg-opacity-40" />
               <div className="absolute top-4 sm:top-6 left-4 sm:left-6">
@@ -275,7 +339,7 @@ export default function TripView({ trip, onTripUpdated }) {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
-                    {trip.destination || trip.location || 'Unknown Location'}
+                    {getCitiesDisplay()}
                   </span>
                   <span className="flex items-center">
                     <svg className="w-3 h-3 sm:w-4 sm:h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -341,6 +405,50 @@ export default function TripView({ trip, onTripUpdated }) {
                     </div>
                   </div>
                 </div>
+
+                {/* Multi-City Route (if applicable) */}
+                {(trip.total_cities || 1) > 1 && (
+                  <div className="bg-white rounded-2xl p-6 shadow-sm">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Travel Route</h3>
+                    {tripCities.length > 0 ? (
+                      <div className="space-y-3">
+                        {tripCities
+                          .sort((a, b) => a.order_index - b.order_index)
+                          .map((city, index) => (
+                          <div key={city.id} className="flex items-center space-x-3">
+                            <div className="flex-shrink-0 w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-semibold">
+                              {index + 1}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="font-medium text-gray-900 truncate">{city.city_name}</p>
+                              {city.country && (
+                                <p className="text-sm text-gray-500 truncate">{city.country}</p>
+                              )}
+                              {(city.arrival_date || city.departure_date) && (
+                                <p className="text-xs text-gray-400">
+                                  {city.arrival_date && new Date(city.arrival_date).toLocaleDateString()}
+                                  {city.arrival_date && city.departure_date && ' - '}
+                                  {city.departure_date && new Date(city.departure_date).toLocaleDateString()}
+                                </p>
+                              )}
+                            </div>
+                            {index < tripCities.length - 1 && (
+                              <div className="flex-shrink-0">
+                                <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                                </svg>
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-gray-500 text-sm">
+                        Multi-city trip ({trip.total_cities} cities)
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 {/* Group Members */}
                 <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm">
@@ -497,6 +605,9 @@ export default function TripView({ trip, onTripUpdated }) {
         
       case 'itinerary':
         return <Itinerary trip={trip} canEdit={canEdit} />;
+        
+      case 'expenses':
+        return <ExpenseManager trip={trip} />;
         
       case 'chat':
         return <TripChat trip={trip} />;

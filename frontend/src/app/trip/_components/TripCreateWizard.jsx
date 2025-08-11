@@ -2,24 +2,61 @@
 import { useState } from 'react';
 import { tripApi } from '../../../lib/api';
 import { supabase } from '../../../lib/supabase';
+import MultiCitySelector from './MultiCitySelector';
 
-export default function TripCreateWizard({ onTripCreated }) {
+export default function TripCreateWizard({ onTripCreated, initialData }) {
   const [currentStep, setCurrentStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [error, setError] = useState('');
-  const [formData, setFormData] = useState({
-    title: '',
-    description: '',
-    destination: '',
-    start_date: '',
-    end_date: '',
-    budget: '',
-    max_members: '',
-    tags: [],
-    visibility: 'public', // public, private, link
-    cover_image: null,
-    cover_image_url: null
+  const [formData, setFormData] = useState(() => {
+    // Use initial data if provided, otherwise use defaults
+    if (initialData) {
+      return {
+        title: initialData.title || '',
+        description: initialData.description || '',
+        cities: initialData.cities && initialData.cities.length > 0 
+          ? initialData.cities 
+          : [{
+              id: Date.now(),
+              city_name: '',
+              country: '',
+              arrival_date: '',
+              departure_date: '',
+              notes: ''
+            }],
+        start_date: initialData.start_date || '',
+        end_date: initialData.end_date || '',
+        budget: initialData.budget || '',
+        max_members: initialData.max_members || '',
+        tags: initialData.tags || [],
+        visibility: initialData.visibility || 'public',
+        cover_image: null,
+        cover_image_url: initialData.cover_image_url || null
+      };
+    }
+    
+    // Default form data
+    return {
+      title: '',
+      description: '',
+      cities: [{
+        id: Date.now(),
+        city_name: '',
+        country: '',
+        arrival_date: '',
+        departure_date: '',
+        notes: ''
+      }],
+      start_date: '',
+      end_date: '',
+      budget: '',
+      max_members: '',
+      tags: [],
+      visibility: 'public', // public, private, link
+      cover_image: null,
+      cover_image_url: null
+    };
   });
 
   const availableTags = [
@@ -130,7 +167,7 @@ export default function TripCreateWizard({ onTripCreated }) {
   const validateStep = (step) => {
     switch (step) {
       case 1:
-        return formData.title && formData.description && formData.destination;
+        return formData.title && formData.description && formData.cities.length > 0 && formData.cities[0].city_name;
       case 2:
         return formData.start_date && formData.end_date && formData.budget;
       case 3:
@@ -164,7 +201,7 @@ export default function TripCreateWizard({ onTripCreated }) {
       const tripData = {
         title: formData.title,
         description: formData.description,
-        location: formData.destination,
+        cities: formData.cities.filter(city => city.city_name), // Only include cities with names
         start_date: formData.start_date,
         end_date: formData.end_date,
         budget: parseInt(formData.budget) || 0,
@@ -269,19 +306,12 @@ export default function TripCreateWizard({ onTripCreated }) {
                 />
               </div>
 
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-3">
-                  Destination *
-                </label>
-                <input
-                  type="text"
-                  name="destination"
-                  value={formData.destination}
-                  onChange={handleInputChange}
-                  placeholder="e.g., Manali, Himachal Pradesh, India"
-                  className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all duration-200 text-lg"
-                />
-              </div>
+              {/* Multi-City Selector */}
+              <MultiCitySelector 
+                cities={formData.cities} 
+                setCities={(cities) => setFormData(prev => ({ ...prev, cities }))}
+                errors={{}}
+              />
 
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-3">
@@ -470,8 +500,15 @@ export default function TripCreateWizard({ onTripCreated }) {
                   <span className="ml-2 text-gray-900">{formData.title}</span>
                 </div>
                 <div>
-                  <span className="font-medium text-gray-700">Location:</span>
-                  <span className="ml-2 text-gray-900">{formData.destination}</span>
+                  <span className="font-medium text-gray-700">Cities:</span>
+                  <span className="ml-2 text-gray-900">
+                    {formData.cities.map(city => city.city_name).filter(Boolean).join(' → ')}
+                    {formData.cities.length > 1 && (
+                      <span className="text-sm text-gray-500 ml-2">
+                        ({formData.cities.length} destinations)
+                      </span>
+                    )}
+                  </span>
                 </div>
                 <div>
                   <span className="font-medium text-gray-700">Dates:</span>

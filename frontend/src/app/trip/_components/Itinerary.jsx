@@ -28,6 +28,113 @@ export default function Itinerary({ trip, canEdit }) {
   const [showComments, setShowComments] = useState(false);
   const [selectedItemForComments, setSelectedItemForComments] = useState(null);
   const [commentCounts, setCommentCounts] = useState({});
+  const [searchTerm, setSearchTerm] = useState('');
+  const [viewMode, setViewMode] = useState('list'); // 'list' or 'calendar'
+  const [currentCalendarMonth, setCurrentCalendarMonth] = useState(new Date());
+
+  // Helper function to highlight search terms
+  const highlightSearchTerm = (text, searchTerm) => {
+    if (!searchTerm || !text) return text;
+    
+    const regex = new RegExp(`(${searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+    const parts = text.split(regex);
+    
+    return parts.map((part, index) => 
+      regex.test(part) ? (
+        <span key={index} className="bg-yellow-200 px-1 rounded">
+          {part}
+        </span>
+      ) : part
+    );
+  };
+
+  // Calendar helper functions
+  const getCalendarDays = (year, month) => {
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const daysInMonth = lastDay.getDate();
+    const startingDayOfWeek = firstDay.getDay();
+    
+    const days = [];
+    
+    // Add empty cells for previous month days
+    for (let i = 0; i < startingDayOfWeek; i++) {
+      days.push(null);
+    }
+    
+    // Add days of current month
+    for (let day = 1; day <= daysInMonth; day++) {
+      days.push(new Date(year, month, day));
+    }
+    
+    return days;
+  };
+
+  const getItemsForDate = (date) => {
+    if (!date || !trip.start_date) return [];
+    
+    const tripStart = new Date(trip.start_date);
+    
+    // Normalize both dates to avoid timezone issues
+    const normalizedTripStart = new Date(tripStart.getFullYear(), tripStart.getMonth(), tripStart.getDate());
+    const normalizedDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    
+    // Calculate the difference in days
+    const diffTime = normalizedDate.getTime() - normalizedTripStart.getTime();
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    
+    // Day number starts from 1 for the start date, so:
+    // Start date (diffDays = 0) should be Day 1
+    // Next date (diffDays = 1) should be Day 2, etc.
+    const dayNumber = diffDays + 1;
+    
+    // Only return items if the day number is valid (positive and within trip duration)
+    if (dayNumber < 1 || dayNumber > getTripDuration()) {
+      return [];
+    }
+    
+    const dayItems = groupedItinerary[dayNumber] || [];
+    
+    // Filter by search term if active
+    if (searchTerm) {
+      return dayItems.filter(item => 
+        item.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.location?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.notes?.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+    
+    return dayItems;
+  };
+
+  const isDateInTripRange = (date) => {
+    if (!trip.start_date || !trip.end_date || !date) return false;
+    
+    const tripStart = new Date(trip.start_date);
+    const tripEnd = new Date(trip.end_date);
+    
+    // Normalize all dates to avoid timezone issues
+    const normalizedTripStart = new Date(tripStart.getFullYear(), tripStart.getMonth(), tripStart.getDate());
+    const normalizedTripEnd = new Date(tripEnd.getFullYear(), tripEnd.getMonth(), tripEnd.getDate());
+    const normalizedDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    
+    const isInRange = normalizedDate >= normalizedTripStart && normalizedDate <= normalizedTripEnd;
+    
+    return isInRange;
+  };
+
+  const navigateCalendar = (direction) => {
+    setCurrentCalendarMonth(prev => {
+      const newDate = new Date(prev);
+      if (direction === 'prev') {
+        newDate.setMonth(newDate.getMonth() - 1);
+      } else {
+        newDate.setMonth(newDate.getMonth() + 1);
+      }
+      return newDate;
+    });
+  };
 
   // Check if itinerary is locked based on trip settings and dates
   const isItineraryLocked = () => {
@@ -60,8 +167,13 @@ export default function Itinerary({ trip, canEdit }) {
   useEffect(() => {
     if (trip?.id) {
       loadItinerary();
+      
+      // Set calendar to start with trip start date if available
+      if (trip.start_date) {
+        setCurrentCalendarMonth(new Date(trip.start_date));
+      }
     }
-  }, [trip?.id]);
+  }, [trip?.id, trip?.start_date]);
 
   const loadItinerary = async () => {
     try {
@@ -83,6 +195,13 @@ export default function Itinerary({ trip, canEdit }) {
       if (response.ok) {
         const data = await response.json();
         console.log('Itinerary data received:', data);
+        console.log('Individual items:', data.itinerary?.map(item => ({
+          id: item.id,
+          title: item.title,
+          day: item.day,
+          date: item.date,
+          time: item.time
+        })));
         setItinerary(data.itinerary || []);
       } else {
         const errorData = await response.json();
@@ -270,16 +389,28 @@ export default function Itinerary({ trip, canEdit }) {
   };
 
   const getDateForDay = (day) => {
-    const startDate = new Date(trip.start_date || trip.startDate);
-    const targetDate = new Date(startDate);
-    targetDate.setDate(startDate.getDate() + day - 1);
-    return targetDate.toISOString().split('T')[0];
+    const startDateStr = trip.start_date || trip.startDate;
+    // Parse the date string directly as YYYY-MM-DD to avoid timezone issues
+    const [year, month, dayOfMonth] = startDateStr.split('-').map(Number);
+    // Create date in local timezone, then add (day - 1) days
+    const targetDate = new Date(year, month - 1, dayOfMonth + day - 1);
+    
+    // Format as YYYY-MM-DD without timezone conversion
+    const yyyy = targetDate.getFullYear();
+    const mm = String(targetDate.getMonth() + 1).padStart(2, '0');
+    const dd = String(targetDate.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
   };
 
   const getTripDuration = () => {
     const start = new Date(trip.start_date || trip.startDate);
     const end = new Date(trip.end_date || trip.endDate);
-    return Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
+    
+    // Normalize dates to avoid timezone issues
+    const normalizedStart = new Date(start.getFullYear(), start.getMonth(), start.getDate());
+    const normalizedEnd = new Date(end.getFullYear(), end.getMonth(), end.getDate());
+    
+    return Math.floor((normalizedEnd - normalizedStart) / (1000 * 60 * 60 * 24)) + 1;
   };
 
   const groupedItinerary = itinerary.reduce((acc, item) => {
@@ -398,6 +529,39 @@ export default function Itinerary({ trip, canEdit }) {
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Trip Itinerary</h2>
           
+          {/* View Toggle */}
+          <div className="flex items-center space-x-2 mt-3">
+            <span className="text-sm font-medium text-gray-700">View:</span>
+            <div className="flex bg-gray-100 rounded-lg p-1">
+              <button
+                onClick={() => setViewMode('list')}
+                className={`px-3 py-1 text-sm font-medium rounded transition-all ${
+                  viewMode === 'list'
+                    ? 'bg-white text-blue-600 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                <svg className="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                </svg>
+                List
+              </button>
+              <button
+                onClick={() => setViewMode('calendar')}
+                className={`px-3 py-1 text-sm font-medium rounded transition-all ${
+                  viewMode === 'calendar'
+                    ? 'bg-white text-blue-600 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                <svg className="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                Calendar
+              </button>
+            </div>
+          </div>
+          
           {/* Show lock message if itinerary is locked */}
           {canEdit && isItineraryLocked() && (
             <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mt-2">
@@ -429,6 +593,55 @@ export default function Itinerary({ trip, canEdit }) {
             <p className="text-sm text-gray-500 mt-1">
               View-only access • Only Admins and Managers can edit the itinerary
             </p>
+          )}
+          
+          {/* Activity Search */}
+          {itinerary.length > 0 && (
+            <div className="mt-4">
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Search activities..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full px-4 py-2 pl-10 pr-4 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                />
+                <svg 
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                {searchTerm && (
+                  <button
+                    onClick={() => setSearchTerm('')}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                )}
+              </div>
+              {searchTerm && (
+                <div className="mt-2 text-sm text-gray-600">
+                  {(() => {
+                    const totalResults = itinerary.filter(item => 
+                      item.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                      item.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                      item.location?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                      item.notes?.toLowerCase().includes(searchTerm.toLowerCase())
+                    ).length;
+                    
+                    return totalResults > 0 
+                      ? `Found ${totalResults} ${totalResults === 1 ? 'activity' : 'activities'} matching "${searchTerm}"`
+                      : `No activities found matching "${searchTerm}"`;
+                  })()}
+                </div>
+              )}
+            </div>
           )}
         </div>
         {canEditItinerary && (
@@ -514,7 +727,7 @@ export default function Itinerary({ trip, canEdit }) {
             {/* Modal Body */}
             <div className="p-4 sm:p-6">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-                <div className="sm:col-span-2 sm:col-span-1">
+                <div className="sm:col-span-2">
                   <label className="block text-sm font-semibold text-gray-700 mb-2 sm:mb-3">Activity Title *</label>
                   <input
                     type="text"
@@ -646,41 +859,67 @@ export default function Itinerary({ trip, canEdit }) {
         </div>
       )}
 
-      {/* Itinerary Timeline */}
-      <div className="space-y-8">
-        {Array.from({ length: getTripDuration() }, (_, dayIndex) => {
-          const dayNumber = dayIndex + 1;
-          const dayItems = groupedItinerary[dayNumber] || [];
-          const dayDate = getDateForDay(dayNumber);
-          
-          return (
-            <div 
-              key={dayNumber} 
-              className={`bg-white rounded-xl shadow-sm overflow-hidden transition-all duration-200 ${
-                dragOverDay === dayNumber ? 'ring-2 ring-blue-300 bg-blue-50' : ''
-              }`}
-              onDragOver={(e) => handleDragOver(e, dayNumber)}
-              onDragLeave={handleDragLeave}
-              onDrop={(e) => handleDrop(e, dayNumber)}
-            >
-              <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-lg font-semibold">Day {dayNumber}</h3>
-                    <p className="text-blue-100">{new Date(dayDate).toLocaleDateString('en-US', { 
-                      weekday: 'long', 
-                      year: 'numeric', 
-                      month: 'long', 
-                      day: 'numeric' 
-                    })}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-sm text-blue-100">{dayItems.length} activities</p>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="p-6">
+          {/* Itinerary Timeline - List View */}
+          {viewMode === 'list' && (
+            <div className="space-y-8">
+              {Array.from({ length: getTripDuration() }, (_, dayIndex) => {
+                const dayNumber = dayIndex + 1;
+                const allDayItems = groupedItinerary[dayNumber] || [];
+                
+                // Filter items based on search term
+                const dayItems = searchTerm 
+                  ? allDayItems.filter(item => 
+                      item.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                      item.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                      item.location?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                      item.notes?.toLowerCase().includes(searchTerm.toLowerCase())
+                    )
+                  : allDayItems;
+                
+                const dayDate = getDateForDay(dayNumber);
+                
+                // Hide days with no matching activities when searching
+                if (searchTerm && dayItems.length === 0) {
+                  return null;
+                }
+                
+                return (
+                  <div 
+                    key={dayNumber} 
+                    className={`bg-white rounded-xl shadow-sm overflow-hidden transition-all duration-200 ${
+                      dragOverDay === dayNumber ? 'ring-2 ring-blue-300 bg-blue-50' : ''
+                    }`}
+                    onDragOver={(e) => handleDragOver(e, dayNumber)}
+                    onDragLeave={handleDragLeave}
+                    onDrop={(e) => handleDrop(e, dayNumber)}
+                  >
+                    <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h3 className="text-lg font-semibold">Day {dayNumber}</h3>
+                          <p className="text-blue-100">{new Date(dayDate).toLocaleDateString('en-US', { 
+                            weekday: 'long', 
+                            year: 'numeric', 
+                            month: 'long', 
+                            day: 'numeric' 
+                          })}</p>
+                          {/* Debug info - remove later */}
+                          <p className="text-xs text-blue-200">
+                            Date calc: {dayDate} | Items in this day: {allDayItems.map(item => `${item.title}(day:${item.day})`).join(', ')}
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm text-blue-100">
+                            {dayItems.length} {searchTerm ? 'matching' : ''} activities
+                            {searchTerm && allDayItems.length > dayItems.length && (
+                              <span className="block text-xs opacity-75">
+                                of {allDayItems.length} total
+                              </span>
+                            )}
+                          </p>
+                        </div>
+                      </div>
+                    </div>              <div className="p-6">
                 {dayItems.length > 0 ? (
                   <div className="space-y-4">
                     {dayItems
@@ -713,7 +952,7 @@ export default function Itinerary({ trip, canEdit }) {
                         <div className="flex-grow">
                           <div className="flex items-start justify-between">
                             <div>
-                              <h4 className="font-semibold text-gray-900">{item.title}</h4>
+                              <h4 className="font-semibold text-gray-900">{highlightSearchTerm(item.title, searchTerm)}</h4>
                               <div className="flex items-center space-x-4 text-sm text-gray-500 mt-1">
                                 <span className="flex items-center">
                                   <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -727,12 +966,12 @@ export default function Itinerary({ trip, canEdit }) {
                                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                                     </svg>
-                                    {item.location}
+                                    {highlightSearchTerm(item.location, searchTerm)}
                                   </span>
                                 )}
                               </div>
                               {item.description && (
-                                <p className="text-gray-600 mt-2">{item.description}</p>
+                                <p className="text-gray-600 mt-2">{highlightSearchTerm(item.description, searchTerm)}</p>
                               )}
                               
                               {/* Additional Information */}
@@ -858,8 +1097,131 @@ export default function Itinerary({ trip, canEdit }) {
               </div>
             </div>
           );
-        }          )}
+        })}
         </div>
+      )}
+
+      {/* Calendar View */}
+      {viewMode === 'calendar' && (
+        <div className="bg-white rounded-xl shadow-sm">
+          {/* Calendar Header */}
+          <div className="flex items-center justify-between p-4 border-b border-gray-200">
+            <button
+              onClick={() => navigateCalendar('prev')}
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            
+            <h3 className="text-lg font-semibold text-gray-900">
+              {currentCalendarMonth.toLocaleDateString('en-US', { 
+                month: 'long', 
+                year: 'numeric' 
+              })}
+            </h3>
+            
+            <button
+              onClick={() => navigateCalendar('next')}
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
+
+          {/* Calendar Grid */}
+          <div className="p-4">
+            {/* Day headers */}
+            <div className="grid grid-cols-7 gap-1 mb-2">
+              {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+                <div key={day} className="p-2 text-center text-sm font-medium text-gray-500">
+                  {day}
+                </div>
+              ))}
+            </div>
+
+            {/* Calendar days */}
+            <div className="grid grid-cols-7 gap-1">
+              {getCalendarDays(currentCalendarMonth.getFullYear(), currentCalendarMonth.getMonth()).map((date, index) => {
+                const isInTripRange = date && isDateInTripRange(date);
+                const dayItems = date ? getItemsForDate(date) : [];
+                
+                // Debug: Calculate the day number for this date
+                let dayNumber = null;
+                if (date && trip.start_date) {
+                  const tripStart = new Date(trip.start_date);
+                  const normalizedTripStart = new Date(tripStart.getFullYear(), tripStart.getMonth(), tripStart.getDate());
+                  const normalizedDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+                  const diffTime = normalizedDate.getTime() - normalizedTripStart.getTime();
+                  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+                  dayNumber = diffDays + 1;
+                }
+                
+                return (
+                  <div
+                    key={index}
+                    className={`min-h-[80px] p-1 border rounded-lg ${
+                      !date 
+                        ? 'bg-gray-50' 
+                        : isInTripRange 
+                          ? 'bg-blue-50 border-blue-200' 
+                          : 'bg-gray-50 border-gray-200'
+                    }`}
+                  >
+                    {date && (
+                      <>
+                        <div className={`text-sm font-medium mb-1 ${
+                          isInTripRange ? 'text-blue-900' : 'text-gray-400'
+                        }`}>
+                          {date.getDate()}
+                          {/* Debug info - remove later */}
+                          {isInTripRange && (
+                            <div className="text-xs text-gray-500">
+                              Day {dayNumber}
+                            </div>
+                          )}
+                        </div>
+                        
+                        {isInTripRange && dayItems.length > 0 && (
+                          <div className="space-y-1">
+                            {dayItems
+                              .sort((a, b) => a.time.localeCompare(b.time))
+                              .slice(0, 2) // Show max 2 items, rest will show as "+X more"
+                              .map(item => (
+                                <div
+                                  key={item.id}
+                                  className="text-xs bg-white border border-blue-200 rounded px-1 py-0.5 truncate hover:bg-blue-100 cursor-pointer transition-colors"
+                                  title={`${item.time} - ${item.title}${item.location ? ` at ${item.location}` : ''}`}
+                                  onClick={() => {
+                                    setSelectedItemForComments(item);
+                                    setShowComments(true);
+                                  }}
+                                >
+                                  <span className="font-medium text-blue-800">{item.time}</span>
+                                  <div className="text-blue-700 leading-tight">
+                                    {highlightSearchTerm(item.title, searchTerm)}
+                                  </div>
+                                </div>
+                              ))}
+                            {dayItems.length > 2 && (
+                              <div className="text-xs text-blue-600 font-medium">
+                                +{dayItems.length - 2} more
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
 
         {/* Empty State */}
         {itinerary.length === 0 && (

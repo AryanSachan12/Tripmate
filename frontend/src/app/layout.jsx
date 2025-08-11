@@ -15,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "TripMate",
-  keywords: ["tripmate", "travel", "itinerary", "planning"],
+  title: "GlobeTrotter",
+  keywords: ["globetrotter", "travel", "itinerary", "planning"],
   description: "Your ultimate travel companion for planning and managing trips.",
 };
 

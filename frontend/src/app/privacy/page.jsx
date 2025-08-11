@@ -122,7 +122,7 @@ export default function Privacy() {
                 We are not responsible for the privacy practices of these external services.
               </p>
               <p>
-                We encourage you to review the privacy policies of any third-party services you use in connection with TripMate.
+                We encourage you to review the privacy policies of any third-party services you use in connection with GlobeTrotter.
               </p>
             </div>
 
@@ -161,7 +161,7 @@ export default function Privacy() {
             <div className="text-gray-700 mb-6">
               <p className="mb-4">If you have any questions about this Privacy Policy or our privacy practices, please contact us at:</p>
               <div className="space-y-1">
-                <p><strong>Email:</strong> privacy@tripmate.com</p>
+                <p><strong>Email:</strong> privacy@globetrotter.com</p>
                 <p><strong>Address:</strong> 123 Travel Street, Adventure City, AC 12345</p>
                 <p><strong>Phone:</strong> +1 (555) 123-4567</p>
               </div>
@@ -170,7 +170,7 @@ export default function Privacy() {
 
           <div className="mt-8 pt-8 border-t border-gray-200">
             <p className="text-sm text-gray-500 text-center">
-              © 2024 TripMate. All rights reserved.
+              © 2024 GlobeTrotter. All rights reserved.
             </p>
           </div>
         </div>

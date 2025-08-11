@@ -1,7 +1,10 @@
 // Application constants for TripMate
 
 // App configuration
-export const APP_NAME = 'TripMate';
+// Application constants for GlobeTrotter
+
+// Application Name
+export const APP_NAME = 'GlobeTrotter';
 export const APP_VERSION = '1.0.0';
 export const APP_DESCRIPTION = 'Plan, collaborate, and create unforgettable travel experiences with friends and family.';
 
