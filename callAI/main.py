@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from routes.twilio import router as twilio_router
+from routes.ml import router as ml_router
 import os
 from dotenv import load_dotenv
 import importlib
@@ -18,6 +19,7 @@ app.add_middleware(
 )
 
 app.include_router(twilio_router)
+app.include_router(ml_router)   
 
 @app.get("/health/supabase")
 def health_supabase():
