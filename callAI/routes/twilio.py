@@ -1,4 +1,4 @@
-from fastapi import APIRouter, WebSocket
+from fastapi import APIRouter, WebSocket, Request
 from fastapi.responses import Response
 from twilio.twiml.voice_response import VoiceResponse, Connect
 from twilio.rest import Client
@@ -12,6 +12,11 @@ import whisper
 from websockets.exceptions import ConnectionClosed
 import google.generativeai as genai
 import asyncio
+import json
+import re
+from typing import Optional, Tuple, Any
+import importlib
+create_client = None
 
 router = APIRouter(prefix="/twilio", tags=["twilio"]) 
 
@@ -19,8 +24,8 @@ TEXT = ""
 AUDIO_FILE = "twilio_audio.wav"
 AUDIO_BUFFER = bytearray()
 BUFFER_DURATION = 8
-FILE_NO = 0
 STREAM_SID = ""
+CALLER_NUMBER: Optional[str] = None
 
 model = whisper.load_model("small")
 
@@ -42,13 +47,13 @@ generation_config = {
 }
 
 TRAVEL_SYSTEM_INSTRUCTION = (
-  "You are an expert AI Travel Assistant for Tripmate. Help users plan trips: suggest destinations, concise itineraries, flights and stays tips, budget ranges, visa notes, local transport, safety, and weather.\n\n"
-  "Keep answers practical and specific to origin, dates, budget, interests, and travelers. If details are missing, assume reasonably and say so.\n\n"
-  "Reply as one short paragraph under 100 words suitable for TTS, conversational and friendly."
+  "You are an SOS emergency help agent. Extract JSON only with keys: location (string), emergency (string), and output (string).\n"
+  "Return strictly a JSON object, no extra text. Example: {\"location\":\"Chandni Chowk, New Delhi\",\"emergency\":\"thief stole my phone\",\"output\":\"I have sent the information ...\"}"
 )
 
 _model = None
 _chat_session = None
+_supabase: Optional[Any] = None
 
 
 def _ensure_genai() -> bool:
@@ -66,7 +71,7 @@ def _get_chat_session():
   if not _ensure_genai():
     return None
   _model = genai.GenerativeModel(
-    model_name="gemini-2.5-flash",
+  model_name="gemini-2.5-flash",
     generation_config=generation_config,
     system_instruction=TRAVEL_SYSTEM_INSTRUCTION,
   )
@@ -75,13 +80,13 @@ def _get_chat_session():
       {
         "role": "user",
         "parts": [
-          "Help me plan a short beach getaway in September",
+          "I am at Chandni Chowk, New Delhi, a thief just stole my phone.",
         ],
       },
       {
         "role": "model",
         "parts": [
-          "A September beach break works well in Goa or Gokarna. Fly into GOI, stay near Palolem or Benaulim, rent a scooter, and plan sunrise beaches, spice farm, and seafood. Expect 28–30°C with occasional showers. Pick homestays for value and walkable access.",
+          "{ \"location\": \"Chandni Chowk, New Delhi\", \"emergency\": \"thief stole my phone\", \"output\": \"I have sent the information about this theft to relevant authorities, help will be on the way\" }",
         ],
       },
     ]
@@ -89,14 +94,98 @@ def _get_chat_session():
   return _chat_session
 
 
+def _get_supabase() -> Optional[Any]:
+  global _supabase
+  if _supabase is not None:
+    return _supabase
+  global create_client
+  if create_client is None:
+    try:
+      supa = importlib.import_module("supabase")
+      create_client = getattr(supa, "create_client", None)
+    except Exception:
+      create_client = None
+  if create_client is None:
+    print("Supabase client not available. Install 'supabase' package.")
+    return None
+  url = os.getenv("SUPABASE_URL")
+  key = os.getenv("SUPABASE_SERVICE_ROLE_KEY") or os.getenv("SUPABASE_ANON_KEY")
+  if not url or not key:
+    print("Supabase env vars missing: SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY/ANON_KEY")
+    return None
+  try:
+    _supabase = create_client(url, key)
+    return _supabase
+  except Exception as e:
+    print("Failed to init Supabase:", e)
+    return None
+
+
+def _extract_json(text: str) -> Optional[dict]:
+  if not text:
+    return None
+  # Strip code fences if present
+  fenced = re.search(r"```(?:json)?\s*(\{[\s\S]*?\})\s*```", text)
+  raw = fenced.group(1) if fenced else text
+  # Try direct JSON parse; fallback to first JSON object substring
+  try:
+    return json.loads(raw)
+  except Exception:
+    obj_match = re.search(r"\{[\s\S]*\}", raw)
+    if obj_match:
+      try:
+        return json.loads(obj_match.group(0))
+      except Exception:
+        return None
+    return None
+
+
+def _store_emergency(location: Optional[str], emergency: Optional[str], model_json: Optional[dict] = None, mobile_no: Optional[str] = None) -> bool:
+  if not location and not emergency:
+    return False
+  sb = _get_supabase()
+  if sb is None:
+    return False
+  table = os.getenv("SUPABASE_TABLE_NAME", "emergencies")
+  try:
+    payload = {k: v for k, v in {
+      "location": location,
+      "emergency": emergency,
+      "mobile_no": mobile_no,
+      "model_response": model_json,
+    }.items() if v is not None}
+    sb.table(table).insert(payload).execute()
+    print("✅ Stored emergency in Supabase:", payload)
+    return True
+  except Exception as e:
+    print("❌ Supabase insert failed (first attempt):", e)
+    try:
+      if "model_response" in payload:
+        payload2 = {k: v for k, v in payload.items() if k != "model_response"}
+        sb.table(table).insert(payload2).execute()
+        print("✅ Stored emergency without model_response:", payload2)
+        return True
+    except Exception as e2:
+      print("❌ Supabase insert failed (fallback):", e2)
+    return False
+
+
 @router.post("/voice")
-async def handle_incoming_call():
+async def handle_incoming_call(request: Request):
   """Handles incoming call and starts WebSocket stream"""
   response = VoiceResponse()
 
-  response.say("Hello, I’m your Tripmate travel assistant! Where and when would you like to travel?")
+  response.say("Hello, I’m your Tripmate travel assistant! What's the emergency?")
 
   start = Connect()
+  # Twilio posts form-encoded data; read it via FastAPI Request
+  global CALLER_NUMBER
+  try:
+    form = await request.form()
+    CALLER_NUMBER = form.get('From')
+    print(f"Call from: {CALLER_NUMBER}")
+  except Exception as e:
+    print("Failed to read caller number:", e)
 
   start.stream(url=WS_URL)
   response.append(start)
@@ -117,7 +206,8 @@ async def transcribe_audio(filename):
   global TEXT
 
   result = model.transcribe(filename)
-  TEXT += "User: " + result["text"] + "\n"
+  user_text = result.get("text", "").strip()
+  TEXT += "User: " + user_text + "\n"
 
   session = _get_chat_session()
   if session is None:
@@ -126,8 +216,21 @@ async def transcribe_audio(filename):
     return fallback
 
   response = session.send_message(TEXT)
-  TEXT += "Model: " + response.text + "\n"
-  return response.text
+  resp_text = getattr(response, "text", "").strip()
+  TEXT += "Model: " + resp_text + "\n"
+
+  # Parse JSON and store to Supabase
+  parsed = _extract_json(resp_text)
+  if parsed and isinstance(parsed, dict):
+    location = parsed.get("location")
+    emergency = parsed.get("emergency")
+    output = parsed.get("output") or "Help request noted."
+  _store_emergency(location, emergency, model_json=parsed, mobile_no=CALLER_NUMBER)
+  print("✅ Emergency stored:", parsed)
+  return output
+
+  # Fallback to raw text if parsing fails
+  return resp_text or "Help request noted."
 
 
 def mulaw_decode(audio_bytes, quantization_channels=256):
@@ -161,7 +264,7 @@ async def websocket_endpoint(websocket: WebSocket):
 
   audio_data = b""
 
-  global AUDIO_BUFFER, FILE_NO, STREAM_SID, TEXT
+  global AUDIO_BUFFER, STREAM_SID, TEXT
 
   try:
     while True:
@@ -176,13 +279,8 @@ async def websocket_endpoint(websocket: WebSocket):
         audio_chunk = base64.b64decode(data["media"]["payload"])
         audio_data += audio_chunk
         AUDIO_BUFFER.extend(audio_chunk)
-        if len(AUDIO_BUFFER) >= 30000:
-          if FILE_NO < 2:
-            response_text = await save_mulaw_to_wav(AUDIO_BUFFER, f"twilio_audio_{FILE_NO}.wav")
-          elif FILE_NO == 2:
-            response_text = "Got it. I’ve drafted your trip plan; you’ll receive details shortly."
-
-          FILE_NO += 1
+        if len(AUDIO_BUFFER) >= 60000:
+          response_text = await save_mulaw_to_wav(AUDIO_BUFFER, f"twilio_audio.wav")
 
           response_text = response_text or "Message Received."
           tts = gTTS(text=response_text)

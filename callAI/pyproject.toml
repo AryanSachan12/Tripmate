@@ -18,6 +18,7 @@ dependencies = [
     "pywav>=1.1",
     "scipy>=1.13.1",
     "soundfile>=0.13.1",
+    "supabase>=2.18.0",
     "twilio>=9.7.0",
     "uvicorn>=0.35.0",
     "websockets>=15.0.1",
