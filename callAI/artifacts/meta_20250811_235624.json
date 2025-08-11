@@ -1,0 +1,15 @@
+{
+  "feature_columns": [
+    "Age",
+    "GraduateOrNot",
+    "AnnualIncome",
+    "FamilyMembers",
+    "FrequentFlyer",
+    "EverTravelledAbroad"
+  ],
+  "target": "TravelInsurance",
+  "scaler_name": "StandardScaler",
+  "scaler_saved": true,
+  "model_class": "LogisticRegression",
+  "timestamp": "20250811_235624"
+}
