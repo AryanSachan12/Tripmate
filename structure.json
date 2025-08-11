@@ -1,0 +1,62 @@
+{
+  "src": {
+    "app": {
+      "page.jsx": "Landing page (/)",
+      
+      "explore": {
+        "page.jsx": "Public trip explorer (/explore)"
+      },
+
+      "dashboard": {
+        "page.jsx": "User dashboard (/dashboard)"
+      },
+
+      "auth": {
+        "page.jsx": "Unified auth page (/auth)",
+        "layout.jsx": "Optional layout for auth tabs or shared UI",
+        "_components": {
+          "LoginForm.jsx": "Login component",
+          "RegisterForm.jsx": "Signup component",
+          "VerifyOTP.jsx": "OTP verification component",
+          "ForgotPassword.jsx": "Forgot password flow",
+          "ResetPassword.jsx": "Password reset form"
+        }
+      },
+
+      "trip": {
+        "page.jsx": "Trip workspace (create, view, edit, settings)",
+        "layout.jsx": "Shared layout for trip page (optional)",
+        "_components": {
+          "TripCreateWizard.jsx": "Multi-step trip creation form",
+          "TripView.jsx": "Trip details, itinerary, chat, etc.",
+          "TripEditForm.jsx": "Edit trip metadata",
+          "TripSettings.jsx": "Manage roles and join requests",
+          "Itinerary.jsx": "Displays trip itinerary",
+          "TripChat.jsx": "Real-time group chat",
+          "TripAIHelper.jsx": "AI assistant using Gemini",
+          "InviteLinkModal.jsx": "Link-based invite modal"
+        }
+      },
+
+      "invite": {
+        "[inviteId]": {
+          "page.jsx": "Join trip via link (/invite/:inviteId)"
+        }
+      },
+
+      "profile": {
+        "page.jsx": "User profile page (/profile)"
+      },
+
+      "terms": {
+        "page.jsx": "Terms and conditions page (/terms)"
+      },
+
+      "privacy": {
+        "page.jsx": "Privacy policy page (/privacy)"
+      },
+
+      "not-found.jsx": "Custom 404 page"
+    }
+  }
+}

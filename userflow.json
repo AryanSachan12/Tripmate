@@ -1,0 +1,90 @@
+{
+  "flows": {
+    "authentication": {
+      "startAt": "/auth",
+      "steps": [
+        "User visits /auth",
+        "Selects Login or Register (tab or toggle)",
+        {
+          "Register": [
+            "Fills out form in RegisterForm component",
+            "Receives OTP via email",
+            "Verifies using VerifyOTP component",
+            "On success, redirects to /dashboard"
+          ]
+        },
+        {
+          "Login": [
+            "Fills out LoginForm component",
+            "If email OTP or 2FA enabled, uses VerifyOTP",
+            "On success, redirects to /dashboard"
+          ]
+        },
+        {
+          "Forgot Password": [
+            "Opens ForgotPassword component",
+            "Receives reset link or OTP",
+            "Resets password using ResetPassword component"
+          ]
+        }
+      ]
+    },
+
+    "tripCreation": {
+      "startAt": "/dashboard",
+      "steps": [
+        "User clicks 'Create Trip' button",
+        "Redirects to /trip with ?mode=create",
+        "TripCreateWizard component is shown inside trip page",
+        "User fills in trip details and selects trip visibility",
+        "Trip is saved in Supabase",
+        "User becomes Admin of the trip",
+        "App transitions to trip view mode (TripView + Itinerary + Chat)"
+      ]
+    },
+
+    "tripJoin": {
+      "publicTrip": {
+        "startAt": "/explore",
+        "steps": [
+          "User views public trips",
+          "Clicks on a trip",
+          "Redirects to /trip with that trip loaded",
+          "Clicks 'Request to Join'",
+          "Admin or Manager approves from TripSettings component",
+          "User is added as Traveller"
+        ]
+      },
+      "inviteLink": {
+        "startAt": "/invite/:inviteId",
+        "steps": [
+          "User opens invite link",
+          "If not logged in, redirected to /auth?redirect=/invite/:inviteId",
+          "If logged in, sees trip preview",
+          "Clicks 'Join Trip'",
+          "If trip is link-restricted with approval, shows pending until approved",
+          "On approval, redirects to /trip"
+        ]
+      }
+    },
+
+    "tripInteraction": {
+      "startAt": "/trip",
+      "roles": ["Admin", "Manager", "Traveller"],
+      "components": [
+        "Itinerary",
+        "TripChat",
+        "TripAIHelper"
+      ],
+      "permissions": {
+        "Admin": ["Edit trip", "Approve/deny join requests", "Promote to Manager"],
+        "Manager": ["Edit itinerary", "Approve/deny requests"],
+        "Traveller": ["View trip", "Chat", "Use AI assistant"]
+      },
+      "settingsAndEdit": {
+        "accessVia": "Buttons inside TripView",
+        "componentsShown": ["TripSettings", "TripEditForm"]
+      }
+    }
+  }
+}
