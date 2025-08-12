@@ -18,6 +18,11 @@ export const metadata = {
   title: "GlobeTrotter",
   keywords: ["globetrotter", "travel", "itinerary", "planning"],
   description: "Your ultimate travel companion for planning and managing trips.",
+  icons: {
+    icon: '/favicon.ico',
+    shortcut: '/favicon.ico',
+    apple: '/favicon.ico',
+  },
 };
 
 export default function RootLayout({ children }) {

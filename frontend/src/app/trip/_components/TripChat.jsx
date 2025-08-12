@@ -110,6 +110,8 @@ export default function TripChat({ trip }) {
 
   // Send message
   const sendMessage = async (messageData) => {
+    console.log('📤 Sending message:', messageData);
+    
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.access_token) return;
@@ -151,8 +153,12 @@ export default function TripChat({ trip }) {
         body: JSON.stringify(messageData),
       });
 
+      console.log('📤 Message API response status:', response.status);
+
       if (response.ok) {
         const result = await response.json();
+        console.log('📤 Message sent successfully:', result);
+        
         // Replace optimistic message with real one
         setMessages(prev => 
           prev.map(msg => 
@@ -166,6 +172,7 @@ export default function TripChat({ trip }) {
         // Remove optimistic message on error
         setMessages(prev => prev.filter(msg => msg.id !== optimisticMessage.id));
         const errorData = await response.json();
+        console.error('📤 Message send error:', errorData);
         alert(`Error: ${errorData.error}`);
       }
     } catch (error) {
@@ -430,6 +437,8 @@ export default function TripChat({ trip }) {
           filter: `trip_id=eq.${trip.id}`
         },
         async (payload) => {
+          console.log('📨 Real-time message received:', payload);
+          
           // Fetch the complete message with user data
           const { data } = await supabase
             .from('trip_messages')
@@ -439,6 +448,8 @@ export default function TripChat({ trip }) {
             `)
             .eq('id', payload.new.id)
             .single();
+
+          console.log('📨 Fetched complete message data:', data);
 
           if (data) {
             // If this message has a reply_to, fetch the replied message
@@ -463,6 +474,7 @@ export default function TripChat({ trip }) {
             setMessages(prev => {
               const hasOptimistic = prev.some(msg => msg.isOptimistic && msg.user_id === data.user_id);
               if (hasOptimistic) {
+                console.log('🔄 Replacing optimistic message');
                 // Replace the most recent optimistic message from this user
                 const lastOptimisticIndex = prev.findLastIndex(msg => 
                   msg.isOptimistic && msg.user_id === data.user_id
@@ -477,18 +489,25 @@ export default function TripChat({ trip }) {
               // Check if message already exists (avoid duplicates)
               const messageExists = prev.some(msg => msg.id === data.id);
               if (messageExists) {
+                console.log('⚠️ Message already exists, skipping');
                 return prev;
               }
               
+              console.log('✅ Adding new message to chat');
               // Add new message
               return [...prev, data];
             });
           }
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log('🔗 Chat subscription status:', status);
+      });
+
+    console.log('🔗 Setting up real-time subscription for trip:', trip.id);
 
     return () => {
+      console.log('🔌 Cleaning up chat subscription for trip:', trip.id);
       supabase.removeChannel(channel);
     };
   }, [trip?.id]);
