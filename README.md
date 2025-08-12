@@ -2,7 +2,7 @@
 
 A collaborative trip planning and discovery platform where verified users can create, join, and manage travel groups, interact with AI for location suggestions, and plan experiences in real time.
 
-![TripMate](./public/logo.png)
+[VIDEO DEMO](https://www.loom.com/share/df154e4b319948f6a743864edc79b569?sid=f4aa5462-7a02-4b12-b0d2-2f673e691fa1)
 
 ## 🌟 Features
 
