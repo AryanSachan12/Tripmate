@@ -1,5 +1,6 @@
 "use client";
 import { useState } from 'react';
+import Image from 'next/image';
 import { tripApi } from '../../../lib/api';
 import { supabase } from '../../../lib/supabase';
 import MultiCitySelector from './MultiCitySelector';
@@ -552,12 +553,66 @@ export default function TripCreateWizard({ onTripCreated, initialData }) {
   };
 
   return (
-    <div className="bg-white rounded-2xl sm:rounded-3xl shadow-xl overflow-hidden border border-gray-100 mx-2 sm:mx-0">
+    <div className="min-h-screen bg-gray-50 pt-16 sm:pt-20">
+      {/* Hero Section */}
+      <div className="relative mb-8 sm:mb-12">
+        <div className="relative h-64 sm:h-80 lg:h-96 rounded-2xl sm:rounded-3xl overflow-hidden mx-3 sm:mx-4 lg:mx-8">
+          {/* Hero Image */}
+          <Image 
+            src="/create.png" 
+            alt="Create Trip" 
+            fill
+            className="object-cover"
+            priority
+          />
+          
+          {/* Gradient Overlay */}
+          <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/40 to-black/20"></div>
+          
+          {/* Content Overlay */}
+          <div className="absolute inset-0 flex flex-col justify-center items-start p-6 sm:p-8 lg:p-12">
+            <div className="max-w-2xl">
+              <p className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-white mb-4 sm:mb-6 leading-tight">
+                Create Your Adventure
+              </p>
+              <p className="text-lg sm:text-xl lg:text-2xl text-white/90 mb-6 sm:mb-8 leading-relaxed">
+                Plan the perfect group trip and connect with fellow travelers on your next adventure
+              </p>
+              
+              {/* Progress Indicator */}
+              <div className="flex items-center space-x-2 bg-white/20 backdrop-blur-sm rounded-lg px-4 py-2">
+                <span className="text-white font-medium">Step {currentStep} of {steps.length}</span>
+                <div className="flex space-x-1">
+                  {steps.map((_, index) => (
+                    <div
+                      key={index}
+                      className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                        currentStep > index + 1 
+                          ? 'bg-green-400' 
+                          : currentStep === index + 1 
+                            ? 'bg-white' 
+                            : 'bg-white/40'
+                      }`}
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          {/* Bottom Fade for smooth transition */}
+          <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-gray-50 to-transparent"></div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 pb-8">
+        <div className="bg-white rounded-2xl sm:rounded-3xl shadow-xl overflow-hidden border border-gray-100 mx-2 sm:mx-0">
       {/* Enhanced Progress Steps */}
       <div className="px-4 sm:px-8 py-6 sm:py-8 bg-gradient-to-r from-blue-50 to-purple-50 border-b border-gray-100">
         <div className="mb-4">
           <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Create Your Trip</h2>
-          <p className="text-sm sm:text-base text-gray-600">Step {currentStep} of {steps.length}</p>
+          {/* <p className="text-sm sm:text-base text-gray-600">Step {currentStep} of {steps.length}</p> */}
         </div>
         
         {error && (
@@ -684,6 +739,8 @@ export default function TripCreateWizard({ onTripCreated, initialData }) {
               )}
             </button>
           )}
+        </div>
+      </div>
         </div>
       </div>
     </div>
