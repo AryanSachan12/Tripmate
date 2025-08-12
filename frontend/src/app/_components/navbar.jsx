@@ -34,6 +34,9 @@ export default function Navbar() {
             <Link href="/explore" className="text-gray-700 hover:text-blue-600 font-medium transition-colors text-sm xl:text-base">
               Explore
             </Link>
+            <Link href="/community" className="text-gray-700 hover:text-blue-600 font-medium transition-colors text-sm xl:text-base">
+              Community
+            </Link>
             <Link href="/dashboard" className="text-gray-700 hover:text-blue-600 font-medium transition-colors text-sm xl:text-base">
               Dashboard
             </Link>
@@ -137,6 +140,13 @@ export default function Navbar() {
                 onClick={() => setIsMenuOpen(false)}
               >
                 Explore Trips
+              </Link>
+              <Link 
+                href="/community" 
+                className="block px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors font-medium"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Community
               </Link>
               <Link 
                 href="/dashboard" 

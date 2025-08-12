@@ -12,6 +12,7 @@ import InviteLinkModal from './InviteLinkModal';
 import JoinRequestsManager from './JoinRequestsManager';
 import JoinRequestModal from './JoinRequestModal';
 import ExpenseManager from './ExpenseManager';
+import TripReviewSection from './TripReviewSection';
 
 export default function TripView({ trip, onTripUpdated }) {
   const [activeTab, setActiveTab] = useState('overview');
@@ -356,6 +357,9 @@ export default function TripView({ trip, onTripUpdated }) {
                 </div>
               </div>
             </div>
+
+            {/* Trip Review Section - Only for completed trips and members */}
+            <TripReviewSection trip={trip} user={user} />
 
             {/* Description and Details */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">

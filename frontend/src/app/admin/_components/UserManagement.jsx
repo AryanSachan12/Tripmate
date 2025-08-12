@@ -580,7 +580,7 @@ export default function UserManagement({ adminData }) {
                           </span>
                           <div className="text-xs text-gray-400 mt-1">
                             Age: {insurancePredictions[user.id].age}, 
-                            Income: ${insurancePredictions[user.id].annual_income?.toLocaleString()}
+                            Income: ₹{insurancePredictions[user.id].annual_income?.toLocaleString()}
                           </div>
                         </div>
                       ) : (
